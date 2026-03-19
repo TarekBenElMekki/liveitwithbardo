@@ -18,17 +18,39 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://liveitwithbardo.vercel.app"),
   title: {
-    default: "AIESEC in Bardo — Experience Platform",
-    template: "%s | AIESEC in Bardo",
+    default: "Live it With AIESEC in Bardo",
+    template: "%s | Live it With AIESEC in Bardo",
   },
   description:
     "Discover Tunisia through the eyes of those who lived it. Join AIESEC in Bardo for an immersive cultural exchange experience.",
   keywords: ["AIESEC", "Bardo", "Tunisia", "exchange", "cultural exchange", "internship", "volunteer"],
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   openGraph: {
-    title: "AIESEC in Bardo — Experience Platform",
-    description: "Live your experience with Bardo. Join 1,000+ exchange participants across 50+ countries.",
+    title: "Live it With AIESEC in Bardo",
+    description: "Discover Tunisia through the eyes of those who lived it. Join AIESEC in Bardo for an immersive cultural exchange experience.",
     type: "website",
+    url: "https://liveitwithbardo.vercel.app",
+    siteName: "Live it With AIESEC in Bardo",
+    images: [
+      {
+        url: "/hero/hero_static_default.png",
+        width: 1200,
+        height: 630,
+        alt: "Live it With AIESEC in Bardo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Live it With AIESEC in Bardo",
+    description: "Discover Tunisia through the eyes of those who lived it. Join AIESEC in Bardo for an immersive cultural exchange experience.",
+    images: ["/hero/hero_static_default.png"],
   },
 };
 
