@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { locales, localeNames, type Locale } from "@/i18n/config";
 
-export function Navbar() {
+export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const t = useTranslations("nav");
@@ -20,13 +20,17 @@ export function Navbar() {
   // Build locale-prefixed href
   const localePath = (path: string) => `/${currentLocale}${path}`;
 
-  const navLinks = [
-    { href: localePath(""),              label: t("home") },
-    { href: localePath("/discover-bardo"), label: t("discover") },
-    { href: localePath("/our-projects"),   label: t("projects") },
-    { href: localePath("/tunisian-lifestyle"), label: t("lifestyle") },
-    { href: localePath("/faq"),            label: t("faq") },
+  const allNavLinks = [
+    { href: localePath(""),              label: t("home"),      productionVisible: true },
+    { href: localePath("/discover-bardo"), label: t("discover"), productionVisible: false },
+    { href: localePath("/our-projects"),   label: t("projects"), productionVisible: true },
+    { href: localePath("/tunisian-lifestyle"), label: t("lifestyle"), productionVisible: false },
+    { href: localePath("/faq"),            label: t("faq"),      productionVisible: false },
   ];
+
+  const navLinks = isProduction
+    ? allNavLinks.filter((l) => l.productionVisible)
+    : allNavLinks;
 
   const isActive = (href: string) => {
     const base = `/${currentLocale}`;

@@ -44,6 +44,48 @@ interface RateCache {
 let cache: RateCache | null = null;
 const CACHE_TTL = 3_600_000; // 1 hour
 
+// ---------------------------------------------------------------------------
+// In-memory rate limiter (per IP)
+// ---------------------------------------------------------------------------
+
+interface RateLimitEntry {
+  count: number;
+  windowStart: number;
+}
+
+const rateLimitMap = new Map<string, RateLimitEntry>();
+const RATE_LIMIT_MAX = 30;       // max requests per window
+const RATE_LIMIT_WINDOW = 60_000; // 1 minute window
+
+/** Returns true if the request should be blocked. */
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+
+  entry.count += 1;
+  if (entry.count > RATE_LIMIT_MAX) return true;
+
+  return false;
+}
+
+/** Best-effort IP extraction — works on Vercel and standard proxies. */
+function getClientIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+    req.headers.get("x-real-ip") ??
+    "unknown"
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Rate fetch
+// ---------------------------------------------------------------------------
+
 async function getRatesFromTND(): Promise<RateCache> {
   if (cache && Date.now() - cache.ts < CACHE_TTL) return cache;
 
@@ -64,7 +106,23 @@ async function getRatesFromTND(): Promise<RateCache> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Handler
+// ---------------------------------------------------------------------------
+
 export async function GET(req: NextRequest) {
+  const ip = getClientIp(req);
+
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      {
+        status: 429,
+        headers: { "Retry-After": "60" },
+      }
+    );
+  }
+
   const { searchParams } = new URL(req.url);
   const from   = (searchParams.get("from")   ?? "EUR").toUpperCase();
   const to     = (searchParams.get("to")     ?? "TND").toUpperCase();
@@ -86,7 +144,6 @@ export async function GET(req: NextRequest) {
     } else {
       const fromRate = rates[from];
       if (!fromRate) return NextResponse.json({ error: `Unsupported currency: ${from}` }, { status: 400 });
-      // amount FROM → TND: divide by (1 TND → FROM rate)
       amountInTND = amount / fromRate;
     }
 
@@ -96,7 +153,6 @@ export async function GET(req: NextRequest) {
     } else {
       const toRate = rates[to];
       if (!toRate) return NextResponse.json({ error: `Unsupported currency: ${to}` }, { status: 400 });
-      // TND → TO: multiply by (1 TND → TO rate)
       result = amountInTND * toRate;
     }
 

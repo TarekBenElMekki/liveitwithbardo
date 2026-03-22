@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { showPromoBar, promoTargetDate } from "@/lib/env";
 
-/** Target date for the EUROEXPO countdown — update as needed */
-const TARGET = new Date("2026-05-15T09:00:00Z");
+/** Target date driven by NEXT_PUBLIC_PROMO_TARGET_DATE env var */
+const TARGET = new Date(promoTargetDate);
 
 interface TimeLeft {
   days: number;
@@ -63,10 +64,15 @@ export function PromoBar() {
   const [time, setTime] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
+    // Controlled by NEXT_PUBLIC_SHOW_PROMO_BAR — defaults to true
+    if (!showPromoBar) return;
     setTime(calcTimeLeft());
     const id = setInterval(() => setTime(calcTimeLeft()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  // Controlled by NEXT_PUBLIC_SHOW_PROMO_BAR — defaults to true
+  if (!showPromoBar) return null;
 
   return (
     <div

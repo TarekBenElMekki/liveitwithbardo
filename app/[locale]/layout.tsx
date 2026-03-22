@@ -10,6 +10,7 @@ import { ChatAgent } from "@/components/chat/ChatAgent";
 import { CountryLanguagePicker } from "@/components/onboarding/CountryLanguagePicker";
 import { PromoBar } from "@/components/layout/PromoBar";
 import { locales, isRtl, type Locale } from "@/i18n/config";
+import { appUrl, showChatAgent, isProduction } from "@/lib/env";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,7 +19,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://liveitwithbardo.vercel.app"),
+  metadataBase: new URL(appUrl),
   title: {
     default: "Live it With AIESEC in Bardo",
     template: "%s | Live it With AIESEC in Bardo",
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     title: "Live it With AIESEC in Bardo",
     description: "Discover Tunisia through the eyes of those who lived it. Join AIESEC in Bardo for an immersive cultural exchange experience.",
     type: "website",
-    url: "https://liveitwithbardo.vercel.app",
+    url: appUrl,
     siteName: "Live it With AIESEC in Bardo",
     images: [
       {
@@ -53,12 +54,6 @@ export const metadata: Metadata = {
     images: ["/hero/hero_static_default.png"],
   },
 };
-
-// generateStaticParams is intentionally removed from this layout.
-// The homepage reads the published hero config on every request (dynamic),
-// so the entire [locale] segment must be server-rendered on demand.
-// If you need static generation for specific pages in the future, add
-// generateStaticParams to those individual page files instead.
 
 export default async function LocaleLayout({
   children,
@@ -80,11 +75,13 @@ export default async function LocaleLayout({
     <html lang={locale} dir={dir} className={inter.variable}>
       <body>
         <NextIntlClientProvider messages={messages}>
+          {/* PromoBar self-guards via NEXT_PUBLIC_SHOW_PROMO_BAR */}
           <PromoBar />
-          <Navbar />
+          <Navbar isProduction={isProduction} />
           {children}
           <Footer />
-          <ChatAgent />
+          {/* ChatAgent controlled by NEXT_PUBLIC_SHOW_CHAT_AGENT */}
+          {showChatAgent && <ChatAgent />}
           <CountryLanguagePicker />
         </NextIntlClientProvider>
       </body>
