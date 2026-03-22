@@ -108,3 +108,27 @@ export async function loadRawOpportunities(): Promise<GisOpportunity[]> {
     return [];
   }
 }
+import { transformToGroupedProject } from "./group-transform";
+import type { GroupedProject } from "./grouped-types";
+
+/** Grouped loader — one GroupedProject per OPP ID. Used by the public UI. */
+export async function loadGroupedProjects(revalidate = 300): Promise<GroupedProject[]> {
+  const token = process.env.AIESEC_GIS_TOKEN;
+  if (!token) {
+    if (process.env.NODE_ENV !== "production") {
+      console.info("[loader] AIESEC_GIS_TOKEN not set - no grouped projects available");
+    }
+    return [];
+  }
+  try {
+    const opps = await fetchAllOpportunities(token, revalidate);
+    if (opps.length === 0) {
+      console.warn("[loader] GIS API returned 0 opportunities");
+      return [];
+    }
+    return opps.map(transformToGroupedProject);
+  } catch (err) {
+    console.error("[loader] Failed to load GIS data:", err);
+    return [];
+  }
+}

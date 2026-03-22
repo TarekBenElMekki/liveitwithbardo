@@ -1,0 +1,54 @@
+/**
+ * Grouped project type — one entry per OPP ID.
+ * Replaces the flat Project shape for the UI layer.
+ */
+
+import type { SDG, ProjectCategory } from "@/data/projects";
+
+export interface ProjectSlot {
+  startDate: string | null;   // ISO YYYY-MM-DD or null
+  endDate: string | null;
+  openings: number | null;
+  available: number | null;
+}
+
+export interface GroupedProject {
+  /** "opp-<id>" */
+  id: string;
+  /** Raw GIS opportunity ID (numeric string) */
+  oppId: string;
+  /** URL-safe slug: "<oppId>-<slugified-title>" */
+  slug: string;
+  /** Title with square-bracket content stripped */
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+  sdgs: SDG[];
+  /** Earliest start across all slots */
+  startDate: string;
+  /** Latest end across all slots */
+  endDate: string;
+  city: string;
+  category: ProjectCategory;
+  isOpen: boolean;
+  /** GIS programme short name, e.g. "GV", "GT", "GE" */
+  programme: string;
+  /** Sum of openings across all slots (or opp-level openings) */
+  totalOpenings: number | null;
+  /** Sum of available_openings across all slots */
+  totalAvailable: number | null;
+  /** Per-slot breakdown */
+  slots: ProjectSlot[];
+  fee: {
+    amount: number | null;
+    currency: string | null;
+  };
+  logistics: {
+    accommodation: boolean;
+    food: boolean;
+    transport: boolean;
+  };
+  /** External apply URL — only set for GV programme */
+  externalApplyUrl: string | null;
+}

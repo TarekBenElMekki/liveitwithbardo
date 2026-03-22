@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { Project } from "@/data/projects";
+import type { GroupedProject } from "@/lib/projects/grouped-types";
 import { ProjectFilters } from "./ProjectFilters";
-import { ProjectGrid } from "./ProjectGrid";
+import { GroupedProjectGrid } from "./GroupedProjectGrid";
 import { filterProjects, type FilterState } from "@/lib/utils";
 
 const DEFAULT_FILTERS: FilterState = {
@@ -16,10 +16,11 @@ const DEFAULT_FILTERS: FilterState = {
 };
 
 interface ProjectsPageClientProps {
-  projects: Project[];
+  projects: GroupedProject[];
+  locale: string;
 }
 
-export function ProjectsPageClient({ projects }: ProjectsPageClientProps) {
+export function ProjectsPageClient({ projects, locale }: ProjectsPageClientProps) {
   const cities = useMemo(
     () => Array.from(new Set(projects.map((p) => p.city))).sort(),
     [projects]
@@ -39,7 +40,11 @@ export function ProjectsPageClient({ projects }: ProjectsPageClientProps) {
         <p className="text-xs text-gray-400 font-medium tabular-nums">
           {filtered.length} project{filtered.length === 1 ? "" : "s"} found
         </p>
-        <ProjectGrid projects={filtered} onReset={() => setFilters(DEFAULT_FILTERS)} />
+        <GroupedProjectGrid
+          projects={filtered}
+          locale={locale}
+          onReset={() => setFilters(DEFAULT_FILTERS)}
+        />
       </div>
     </section>
   );

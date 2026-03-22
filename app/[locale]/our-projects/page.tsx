@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ProjectsPageClient } from "@/components/projects/ProjectsPageClient";
-import { loadProjects } from "@/lib/projects/loader";
+import { loadGroupedProjects } from "@/lib/projects/loader";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("projects");
@@ -11,10 +11,15 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function OurProjectsPage() {
+export default async function OurProjectsPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const [t, projects] = await Promise.all([
     getTranslations("projects"),
-    loadProjects(),
+    loadGroupedProjects(),
   ]);
 
   return (
@@ -39,7 +44,7 @@ export default async function OurProjectsPage() {
         </div>
       </section>
 
-      <ProjectsPageClient projects={projects} />
+      <ProjectsPageClient projects={projects} locale={locale} />
     </main>
   );
 }
