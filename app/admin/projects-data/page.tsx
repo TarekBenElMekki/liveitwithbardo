@@ -5,11 +5,13 @@ import { transformGisOpportunity } from "@/lib/projects/transform";
 /**
  * /admin/projects-data
  *
- * Protected admin page — staging only, requires valid session (enforced by middleware).
+ * Internal admin page — accessible directly in staging/development.
+ * Blocked (404) in production by middleware.
  * Shows raw GIS API opportunity rows alongside their transformed Project values.
  */
 export default async function ProjectsDataPage() {
-  if (process.env.APP_ENV !== "staging" && process.env.ENABLE_ADMIN !== "true") {
+  // Belt-and-suspenders: middleware already blocks this in production.
+  if (process.env.APP_ENV === "production" || process.env.APP_ENV === undefined) {
     notFound();
   }
 

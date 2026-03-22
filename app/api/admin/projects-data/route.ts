@@ -9,8 +9,8 @@ import { transformGisOpportunity } from "@/lib/projects/transform";
  * Protected by middleware — 404 in production, session-required in staging.
  */
 export async function GET() {
-  // Belt-and-suspenders server guard (middleware already blocks in production)
-  if (process.env.APP_ENV !== "staging" && process.env.ENABLE_ADMIN !== "true") {
+  // Belt-and-suspenders: middleware already blocks this in production.
+  if (process.env.APP_ENV === "production" || process.env.APP_ENV === undefined) {
     return new NextResponse(null, { status: 404 });
   }
 
