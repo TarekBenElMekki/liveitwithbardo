@@ -24,7 +24,7 @@
     "copyright": "AIESEC in Bardo. Tous droits réservés."
   },
   "home": {
-    "globeHeading": "La portée mondiale de la Tunisie",
+    "globeHeading": "La portée mondiale d'AIESEC in Bardo",
     "globeSubtitle": "AIESEC in Bardo connecte les jeunes à travers les continents, en envoyant des participants à l'étranger et en accueillant le monde en Tunisie.",
     "globeSrOnly": "Globe 3D interactif montrant les connexions d'échange entre la Tunisie et des pays comme la France, l'Allemagne, l'Inde, la Chine, l'Italie et l'Australie.",
     "teasersHeading": "Tout ce que vous devez savoir",
@@ -157,7 +157,7 @@
   },
   "picker": {
     "heading": "Bienvenue chez AIESEC in Bardo",
-    "subheading": "Dites-nous d'où vous venez et votre langue préférée pour personnaliser votre expérience.",
+    "subheading": "Choisissez votre langue préférée pour personnaliser votre expérience.",
     "countryLabel": "Votre pays",
     "countryPlaceholder": "Sélectionnez votre pays",
     "languageLabel": "Langue préférée",

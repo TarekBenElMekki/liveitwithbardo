@@ -30,13 +30,13 @@ export function getSavedCountry(): string | null {
 
 export function hasCompletedOnboarding(): boolean {
   if (typeof window === "undefined") return false;
-  return !!(localStorage.getItem(LOCALE_KEY) && localStorage.getItem(COUNTRY_KEY));
+  return !!localStorage.getItem(LOCALE_KEY);
 }
 
-export function saveLocaleAndCountry(locale: Locale, country: string): void {
+export function saveLocaleAndCountry(locale: Locale, country?: string): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(LOCALE_KEY, locale);
-  localStorage.setItem(COUNTRY_KEY, country);
+  if (country) localStorage.setItem(COUNTRY_KEY, country);
   // Set cookie so middleware uses the chosen locale on next request
   document.cookie = `${COOKIE_NAME}=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
 }

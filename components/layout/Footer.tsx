@@ -35,32 +35,14 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a
-                  href="https://instagram.com/aiesec_tunisia"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-900 transition-colors duration-150 focus-ring rounded-md"
-                >
+                <span className="text-gray-400 cursor-default" aria-label={t("instagram")}>
                   {t("instagram")}
-                </a>
+                </span>
               </li>
               <li>
-                <a
-                  href="https://facebook.com/aiesectunisia"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-900 transition-colors duration-150 focus-ring rounded-md"
-                >
-                  {t("facebook")}
-                </a>
-              </li>
-              <li>
-                <a
-                  href="mailto:aiesec.tn@aiesec.net"
-                  className="hover:text-gray-900 transition-colors duration-150 focus-ring rounded-md"
-                >
+                <span className="text-gray-400 cursor-default" aria-label={t("contact")}>
                   {t("contact")}
-                </a>
+                </span>
               </li>
             </ul>
           </nav>

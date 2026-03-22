@@ -24,7 +24,7 @@
     "copyright": "AIESEC in Bardo. جميع الحقوق محفوظة."
   },
   "home": {
-    "globeHeading": "الانتشار العالمي لتونس",
+    "globeHeading": "الانتشار العالمي لـ AIESEC in Bardo",
     "globeSubtitle": "تربط AIESEC in Bardo الشباب عبر القارات، ترسل المشاركين إلى الخارج وترحب بالعالم في تونس.",
     "globeSrOnly": "كرة أرضية ثلاثية الأبعاد تفاعلية تُظهر روابط التبادل بين تونس ودول منها فرنسا وألمانيا والهند والصين وإيطاليا وأستراليا.",
     "teasersHeading": "كل ما تحتاج معرفته",
@@ -157,7 +157,7 @@
   },
   "picker": {
     "heading": "مرحباً بك في AIESEC in Bardo",
-    "subheading": "أخبرنا من أين أنت ولغتك المفضلة حتى نتمكن من تخصيص تجربتك.",
+    "subheading": "اختر لغتك المفضلة لتخصيص تجربتك.",
     "countryLabel": "بلدك",
     "countryPlaceholder": "اختر بلدك",
     "languageLabel": "اللغة المفضلة",

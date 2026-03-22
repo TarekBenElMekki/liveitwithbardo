@@ -1,4 +1,14 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { locales, type Locale } from "@/i18n/config";
+
 export function CtaSection() {
+  const pathname = usePathname();
+  const segments = pathname.split("/");
+  const currentLocale = (locales.includes(segments[1] as Locale) ? segments[1] : "en") as Locale;
+
   return (
     <section
       id="cta"
@@ -23,21 +33,12 @@ export function CtaSection() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-start gap-3">
-          <a
-            href="https://aiesec.org"
-            target="_blank"
-            rel="noopener noreferrer"
-            role="button"
+          <Link
+            href={`/${currentLocale}/our-projects`}
             className="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-white text-accent font-semibold text-sm hover:bg-gray-100 transition-colors duration-150 focus-ring shadow-sm"
           >
             Apply for an Exchange
-          </a>
-          <a
-            href="mailto:aiesec.tn@aiesec.net"
-            className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-white/25 text-white font-semibold text-sm hover:bg-white/10 transition-colors duration-150 focus-ring"
-          >
-            Contact Us
-          </a>
+          </Link>
         </div>
 
         <p className="mt-8 text-xs text-white/40">

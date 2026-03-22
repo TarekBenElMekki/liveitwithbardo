@@ -5,6 +5,7 @@ import type { GroupedProject } from "@/lib/projects/grouped-types";
 import { ProjectFilters } from "./ProjectFilters";
 import { GroupedProjectGrid } from "./GroupedProjectGrid";
 import { filterProjects, type FilterState } from "@/lib/utils";
+import type { SDG } from "@/data/projects";
 
 const DEFAULT_FILTERS: FilterState = {
   category: "all",
@@ -21,12 +22,16 @@ interface ProjectsPageClientProps {
 }
 
 export function ProjectsPageClient({ projects, locale }: ProjectsPageClientProps) {
-  const cities = useMemo(
-    () => Array.from(new Set(projects.map((p) => p.city))).sort(),
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+
+  // Derive the set of SDGs actually present in the loaded projects
+  const availableSdgs = useMemo(
+    () =>
+      Array.from(new Set(projects.flatMap((p) => p.sdgs))).sort(
+        (a, b) => a - b
+      ) as SDG[],
     [projects]
   );
-
-  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
   const filtered = useMemo(
     () => filterProjects(projects, filters),
@@ -36,7 +41,11 @@ export function ProjectsPageClient({ projects, locale }: ProjectsPageClientProps
   return (
     <section aria-label="Project listing" className="py-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex flex-col gap-8">
-        <ProjectFilters filters={filters} cities={cities} onChange={setFilters} />
+        <ProjectFilters
+          filters={filters}
+          availableSdgs={availableSdgs}
+          onChange={setFilters}
+        />
         <p className="text-xs text-gray-400 font-medium tabular-nums">
           {filtered.length} project{filtered.length === 1 ? "" : "s"} found
         </p>
