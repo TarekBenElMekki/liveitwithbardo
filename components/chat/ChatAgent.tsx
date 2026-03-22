@@ -51,7 +51,7 @@ export function ChatAgent() {
   }, []);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end" style={{ display: "none" }} aria-hidden="true">
       {/* Chat panel */}
       <AnimatePresence>
         {isOpen && (

@@ -18,9 +18,18 @@ export function StatsSection() {
       id="stats"
       ref={ref}
       aria-labelledby="stats-heading"
-      className="py-24 px-4 sm:px-6 lg:px-8 bg-white border-y border-gray-100"
+      className="relative py-24 px-4 sm:px-6 lg:px-8 border-y border-gray-100"
+      style={{
+        backgroundImage: "url('/hero/SecondSEction_BG.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
     >
-      <div className="max-w-5xl mx-auto">
+      {/* Overlay for text readability */}
+      <div className="absolute inset-0 bg-white/75" aria-hidden="true" />
+
+      <div className="relative max-w-5xl mx-auto">
         <p
           id="stats-heading"
           className="text-center text-xs font-semibold uppercase tracking-widest text-accent mb-10"

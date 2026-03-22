@@ -83,8 +83,7 @@ export function PromoBar() {
     >
       <span className="flex items-center gap-2 font-medium tracking-wide min-w-0 shrink-0">
         <EuroexpoLogo />
-        <span className="hidden xs:inline">20% promo exclusive in</span>
-        <span className="font-bold uppercase tracking-widest">EUROEXPO</span>
+        <span className="hidden xs:inline">Discover Our Exclusive Discounts — Don&apos;t Miss Out!</span>
       </span>
 
       <span className="text-white/40 shrink-0" aria-hidden="true">·</span>
