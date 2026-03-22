@@ -1,22 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
-import "../globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ChatAgent } from "@/components/chat/ChatAgent";
 import { CountryLanguagePicker } from "@/components/onboarding/CountryLanguagePicker";
 import { PromoBar } from "@/components/layout/PromoBar";
-import { locales, isRtl, type Locale } from "@/i18n/config";
+import { locales, type Locale } from "@/i18n/config";
 import { appUrl, showChatAgent, isProduction } from "@/lib/env";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
@@ -69,22 +61,17 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
-  const dir = isRtl(locale as Locale) ? "rtl" : "ltr";
 
   return (
-    <html lang={locale} dir={dir} className={inter.variable}>
-      <body>
-        <NextIntlClientProvider messages={messages}>
-          {/* PromoBar self-guards via NEXT_PUBLIC_SHOW_PROMO_BAR */}
-          <PromoBar />
-          <Navbar isProduction={isProduction} />
-          {children}
-          <Footer />
-          {/* ChatAgent controlled by NEXT_PUBLIC_SHOW_CHAT_AGENT */}
-          {showChatAgent && <ChatAgent />}
-          <CountryLanguagePicker />
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider messages={messages}>
+      {/* PromoBar self-guards via NEXT_PUBLIC_SHOW_PROMO_BAR */}
+      <PromoBar />
+      <Navbar isProduction={isProduction} />
+      {children}
+      <Footer />
+      {/* ChatAgent controlled by NEXT_PUBLIC_SHOW_CHAT_AGENT */}
+      {showChatAgent && <ChatAgent />}
+      <CountryLanguagePicker />
+    </NextIntlClientProvider>
   );
 }
