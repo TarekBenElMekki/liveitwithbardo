@@ -56,7 +56,7 @@ function SlotRow({ slot, index }: { slot: ProjectSlot; index: number }) {
       {slot.openings != null && (
         <div className="flex items-center gap-1 text-xs text-gray-500 shrink-0">
           <Users size={11} aria-hidden="true" />
-          <span>{slot.openings} spots</span>
+          <span>{slot.openings} slots</span>
         </div>
       )}
     </div>
@@ -148,7 +148,7 @@ export default async function ProjectSlugPage({
                   <span className="text-sm font-normal text-gray-400"> / {project.totalOpenings}</span>
                 )}
               </p>
-              <p className="text-xs text-gray-400">spots available</p>
+              <p className="text-xs text-gray-400">slots available</p>
             </div>
           )}
           {project.fee.amount != null && project.fee.amount > 0 && (

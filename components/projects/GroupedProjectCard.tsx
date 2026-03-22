@@ -113,12 +113,12 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
                 <>
                   <span className="font-semibold text-gray-800">{project.totalAvailable}</span>
                   {project.totalOpenings != null && (
-                    <span className="text-gray-400"> / {project.totalOpenings} spots</span>
+                    <span className="text-gray-400"> / {project.totalOpenings} slots</span>
                   )}
                   <span className="text-gray-400"> available</span>
                 </>
               ) : (
-                <span>{project.totalOpenings} spots</span>
+                <span>{project.totalOpenings} slots</span>
               )}
             </span>
           </div>
@@ -142,7 +142,7 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
                   </span>
                   {slot.openings != null && (
                     <span className="text-gray-400 tabular-nums ml-2 shrink-0">
-                      {slot.openings} spots
+                      {slot.openings} slots
                     </span>
                   )}
                 </li>
