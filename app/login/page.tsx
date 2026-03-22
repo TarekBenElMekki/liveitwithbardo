@@ -16,7 +16,7 @@ function isSafePath(path: string | undefined): path is string {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: { next?: string };
 }) {
   if (process.env.APP_ENV !== "staging") {
     notFound();
@@ -28,12 +28,11 @@ export default async function LoginPage({
   if (sessionValue) {
     const session = await verifySessionCookie(sessionValue);
     if (session) {
-      const { next } = await searchParams;
-      redirect(isSafePath(next) ? next : "/en");
+      redirect(isSafePath(searchParams.next) ? searchParams.next : "/en");
     }
   }
 
-  const { next } = await searchParams;
+  const { next } = searchParams;
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-[var(--bg,#0a0a0a)] px-4">
