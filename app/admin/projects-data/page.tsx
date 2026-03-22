@@ -15,7 +15,7 @@ export default async function ProjectsDataPage() {
 
   const raw = await loadRawOpportunities();
   const transformed = raw.map(transformGisOpportunity);
-  const isConfigured = !!(process.env.AIESEC_GIS_TOKEN && process.env.AIESEC_GIS_MC_ID);
+  const isConfigured = !!process.env.AIESEC_GIS_TOKEN;
 
   return (
     <main className="min-h-screen bg-[var(--bg,#0a0a0a)] text-white p-8">
@@ -25,11 +25,11 @@ export default async function ProjectsDataPage() {
         Source:{" "}
         {isConfigured ? (
           <span className="text-emerald-400">
-            AIESEC GIS API — MC ID {process.env.AIESEC_GIS_MC_ID}
+            AIESEC GIS API — Bardo committee 1270 (GV/GT/GE)
           </span>
         ) : (
           <span className="text-yellow-400">
-            AIESEC_GIS_TOKEN or AIESEC_GIS_MC_ID not set — no live data available
+            AIESEC_GIS_TOKEN not set — no live data available
           </span>
         )}
       </p>
@@ -39,8 +39,7 @@ export default async function ProjectsDataPage() {
           <p className="text-gray-500 text-lg">No opportunities loaded.</p>
           {!isConfigured && (
             <p className="text-gray-600 text-sm">
-              Set <code className="text-yellow-400">AIESEC_GIS_TOKEN</code> and{" "}
-              <code className="text-yellow-400">AIESEC_GIS_MC_ID</code> to fetch live data.
+              Set <code className="text-yellow-400">AIESEC_GIS_TOKEN</code> to fetch live data.
             </p>
           )}
         </div>
