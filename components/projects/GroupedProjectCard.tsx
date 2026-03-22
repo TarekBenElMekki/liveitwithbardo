@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, ArrowRight, Users, Calendar } from "lucide-react";
+import { MapPin, ArrowRight, Users, Calendar, ExternalLink } from "lucide-react";
 import type { GroupedProject } from "@/lib/projects/grouped-types";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,7 @@ function fmtDate(iso: string | null): string {
 
 export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps) {
   const detailHref = `/${locale}/our-projects/${project.slug}`;
+  const isGV = project.programme.toUpperCase() === "GV";
 
   const logisticsTags: string[] = [];
   if (project.logistics.accommodation) logisticsTags.push("Accommodation");
@@ -34,7 +35,22 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
   if (project.logistics.transport) logisticsTags.push("Transport");
 
   return (
-    <article className="rounded-2xl border border-gray-100 bg-white overflow-hidden flex flex-col hover:border-gray-200 hover:shadow-md transition-all duration-200 group">
+    /**
+     * Whole-card click pattern:
+     * The card is a <article> with a block-level <Link> stretched to cover it.
+     * Interactive elements inside (external CTA) use relative z-index to sit
+     * above the card link and stop propagation is not needed — they are
+     * separate stacking contexts via `relative z-10`.
+     */
+    <article className="relative rounded-2xl border border-gray-100 bg-white overflow-hidden flex flex-col hover:border-gray-200 hover:shadow-md transition-all duration-200 group">
+      {/* Full-card link — stretched to cover the entire card */}
+      <Link
+        href={detailHref}
+        className="absolute inset-0 z-0 focus-ring rounded-2xl"
+        aria-label={`View details for ${project.title}`}
+        tabIndex={0}
+      />
+
       {/* Header band */}
       <div
         className={cn(
@@ -48,7 +64,7 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
           </span>
         </div>
         {/* Status + programme chips */}
-        <div className="absolute top-3 right-3 flex gap-1.5">
+        <div className="absolute top-3 right-3 flex gap-1.5 z-10">
           {project.programme && (
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/80 text-gray-600 border border-gray-200">
               {project.programme}
@@ -68,7 +84,7 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
       </div>
 
       {/* Body */}
-      <div className="p-5 flex flex-col gap-3 flex-1">
+      <div className="relative z-10 p-5 flex flex-col gap-3 flex-1 pointer-events-none">
         {/* Category + city */}
         <div className="flex items-center gap-2 flex-wrap">
           <span
@@ -140,12 +156,12 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
           </div>
         )}
 
-        {/* Fee */}
+        {/* Project Fee (EUR only) */}
         {project.fee.amount != null && project.fee.amount > 0 && (
           <p className="text-xs text-gray-500">
-            Fee:{" "}
+            Project Fee:{" "}
             <span className="font-semibold text-gray-700">
-              {project.fee.amount} {project.fee.currency ?? "TND"}
+              €{project.fee.amount}
             </span>
           </p>
         )}
@@ -172,15 +188,37 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
           </div>
         )}
 
-        {/* CTA → internal detail page */}
-        <div className="pt-3 border-t border-gray-100 mt-auto">
-          <Link
-            href={detailHref}
-            className="inline-flex items-center gap-1.5 text-accent text-sm font-semibold hover:gap-2.5 transition-all duration-150 focus-ring rounded-md"
-          >
+        {/* CTA row — pointer-events re-enabled for interactive elements */}
+        <div className="pt-3 border-t border-gray-100 mt-auto flex items-center justify-between gap-3 pointer-events-auto">
+          {/* "View details" — visual affordance; actual click handled by card link */}
+          <span className="inline-flex items-center gap-1.5 text-accent text-sm font-semibold" aria-hidden="true">
             View details
-            <ArrowRight size={13} aria-hidden="true" />
-          </Link>
+            <ArrowRight size={13} />
+          </span>
+
+          {/* External apply CTA — sits above the card link via z-10 */}
+          {isGV && project.externalApplyUrl ? (
+            <a
+              href={project.externalApplyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="relative z-20 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-accent text-white hover:bg-[var(--accent-dark)] transition-colors focus-ring shrink-0"
+              aria-label={`Apply for ${project.title} on AIESEC.org`}
+            >
+              Apply on aiesec.org
+              <ExternalLink size={11} aria-hidden="true" />
+            </a>
+          ) : (
+            <span
+              className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-gray-100 text-gray-400 cursor-not-allowed shrink-0"
+              aria-label="Apply not available for this programme"
+              title={`Apply via AIESEC for ${project.programme || "this programme"} — not available here`}
+            >
+              Apply on aiesec.org
+              <ExternalLink size={11} aria-hidden="true" />
+            </span>
+          )}
         </div>
       </div>
     </article>

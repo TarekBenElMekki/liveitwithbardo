@@ -17,7 +17,7 @@ export interface GroupedProject {
   id: string;
   /** Raw GIS opportunity ID (numeric string) */
   oppId: string;
-  /** URL-safe slug: "<oppId>-<slugified-title>" */
+  /** URL-safe slug: slugified clean title, disambiguated if needed */
   slug: string;
   /** Title with square-bracket content stripped */
   title: string;
@@ -41,8 +41,15 @@ export interface GroupedProject {
   /** Per-slot breakdown */
   slots: ProjectSlot[];
   fee: {
+    /**
+     * Project Fee in EUR from the GIS fee_and_health_insurance JSON scalar.
+     * Uses `project_fee` field when currency is EUR.
+     * Falls back to `programme_fee` if `project_fee` is null and currency is EUR.
+     * null if no EUR fee is available — never invented or converted.
+     */
     amount: number | null;
-    currency: string | null;
+    /** Always "EUR" when amount is set, null otherwise */
+    currency: "EUR" | null;
   };
   logistics: {
     accommodation: boolean;

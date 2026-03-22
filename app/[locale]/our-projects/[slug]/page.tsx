@@ -153,10 +153,10 @@ export default async function ProjectSlugPage({
           )}
           {project.fee.amount != null && project.fee.amount > 0 && (
             <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Programme Fee</p>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Project Fee</p>
               <p className="text-lg font-bold text-gray-900">
-                {project.fee.amount}
-                <span className="text-sm font-normal text-gray-400 ml-1">{project.fee.currency ?? "TND"}</span>
+                €{project.fee.amount}
+                <span className="text-sm font-normal text-gray-400 ml-1">EUR</span>
               </p>
             </div>
           )}

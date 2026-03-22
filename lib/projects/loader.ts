@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Project data loader - AIESEC GIS GraphQL API.
  * Fetches open opportunities for AIESEC in Bardo (committee 1270),
  * programmes GV/GT/GE (7, 8, 9).
@@ -9,6 +9,8 @@ import { projects as staticProjects } from "@/data/projects";
 import type { Project } from "@/data/projects";
 import type { GisOpportunity, GisOpportunitiesResponse } from "./gis-types";
 import { transformGisOpportunity } from "./transform";
+import { transformAllToGroupedProjects } from "./group-transform";
+import type { GroupedProject } from "./grouped-types";
 
 const GIS_ENDPOINT = "https://gis-api.aiesec.org/graphql";
 
@@ -77,6 +79,7 @@ async function fetchAllOpportunities(
   return all;
 }
 
+/** Legacy flat loader - kept for backward compat (admin page, static fallback). */
 export async function loadProjects(revalidate = 300): Promise<Project[]> {
   const token = process.env.AIESEC_GIS_TOKEN;
   if (!token) {
@@ -98,20 +101,7 @@ export async function loadProjects(revalidate = 300): Promise<Project[]> {
   }
 }
 
-export async function loadRawOpportunities(): Promise<GisOpportunity[]> {
-  const token = process.env.AIESEC_GIS_TOKEN;
-  if (!token) return [];
-  try {
-    return await fetchAllOpportunities(token, 0);
-  } catch (err) {
-    console.error("[loader] Failed to load raw GIS data:", err);
-    return [];
-  }
-}
-import { transformToGroupedProject } from "./group-transform";
-import type { GroupedProject } from "./grouped-types";
-
-/** Grouped loader — one GroupedProject per OPP ID. Used by the public UI. */
+/** Grouped loader - one GroupedProject per OPP ID. Used by the public UI. */
 export async function loadGroupedProjects(revalidate = 300): Promise<GroupedProject[]> {
   const token = process.env.AIESEC_GIS_TOKEN;
   if (!token) {
@@ -126,9 +116,20 @@ export async function loadGroupedProjects(revalidate = 300): Promise<GroupedProj
       console.warn("[loader] GIS API returned 0 opportunities");
       return [];
     }
-    return opps.map(transformToGroupedProject);
+    return transformAllToGroupedProjects(opps);
   } catch (err) {
     console.error("[loader] Failed to load GIS data:", err);
+    return [];
+  }
+}
+
+export async function loadRawOpportunities(): Promise<GisOpportunity[]> {
+  const token = process.env.AIESEC_GIS_TOKEN;
+  if (!token) return [];
+  try {
+    return await fetchAllOpportunities(token, 0);
+  } catch (err) {
+    console.error("[loader] Failed to load raw GIS data:", err);
     return [];
   }
 }
