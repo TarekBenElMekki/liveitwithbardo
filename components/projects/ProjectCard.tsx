@@ -1,5 +1,4 @@
 import { MapPin, Calendar, ArrowRight } from "lucide-react";
-import Link from "next/link";
 import type { Project } from "@/data/projects";
 import { cn } from "@/lib/utils";
 

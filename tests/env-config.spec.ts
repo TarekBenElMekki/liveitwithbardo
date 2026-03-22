@@ -191,3 +191,88 @@ test.describe("PromoBar UI", () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+// Projects loader — admin data API
+// ---------------------------------------------------------------------------
+
+test.describe("Admin projects-data API", () => {
+  test("GET /api/admin/projects-data returns 404 in production", async ({ request }) => {
+    test.skip(
+      process.env.APP_ENV !== "production",
+      "Only runs against a production server"
+    );
+    const res = await request.get(`${BASE_URL}/api/admin/projects-data`);
+    expect(res.status()).toBe(404);
+  });
+
+  test("GET /api/admin/projects-data redirects to login without session in staging", async ({ request }) => {
+    test.skip(
+      process.env.APP_ENV !== "staging",
+      "Only runs against a staging server"
+    );
+    const res = await request.get(`${BASE_URL}/api/admin/projects-data`, { maxRedirects: 0 });
+    // Middleware redirects unauthenticated requests to /login
+    expect([301, 302, 307, 308]).toContain(res.status());
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Projects page — GIS loader with static fallback (runs in any environment)
+// ---------------------------------------------------------------------------
+
+test.describe("Projects page — GIS loader", () => {
+  test("GET /en/our-projects returns 200 (falls back to static data when GIS not configured)", async ({ request }) => {
+    const res = await request.get(`${BASE_URL}/en/our-projects`);
+    expect(res.status()).toBe(200);
+  });
+
+  test("GET /fr/our-projects returns 200", async ({ request }) => {
+    const res = await request.get(`${BASE_URL}/fr/our-projects`);
+    expect(res.status()).toBe(200);
+  });
+
+  test("GET /ar/our-projects returns 200", async ({ request }) => {
+    const res = await request.get(`${BASE_URL}/ar/our-projects`);
+    expect(res.status()).toBe(200);
+  });
+
+  test("Projects page renders project cards", async ({ page }) => {
+    await page.goto(`${BASE_URL}/en/our-projects`);
+    // At least one project card should be present (static fallback has 8)
+    const cards = page.locator("article");
+    await expect(cards.first()).toBeVisible();
+  });
+
+  test("Projects page shows result count", async ({ page }) => {
+    await page.goto(`${BASE_URL}/en/our-projects`);
+    // The count label is always rendered
+    const countLabel = page.locator("text=/\\d+ projects? found/");
+    await expect(countLabel).toBeVisible();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Admin projects-data page — protection and content
+// ---------------------------------------------------------------------------
+
+test.describe("Admin projects-data page", () => {
+  test("GET /admin/projects-data returns 404 in production", async ({ request }) => {
+    test.skip(
+      process.env.APP_ENV !== "production",
+      "Only runs against a production server"
+    );
+    const res = await request.get(`${BASE_URL}/admin/projects-data`, { maxRedirects: 0 });
+    expect(res.status()).toBe(404);
+  });
+
+  test("GET /admin/projects-data redirects to login without session in staging", async ({ request }) => {
+    test.skip(
+      process.env.APP_ENV !== "staging",
+      "Only runs against a staging server"
+    );
+    const res = await request.get(`${BASE_URL}/admin/projects-data`, { maxRedirects: 0 });
+    expect([301, 302, 307, 308]).toContain(res.status());
+    expect(res.headers()["location"]).toContain("/login");
+  });
+});

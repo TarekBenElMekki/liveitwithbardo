@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { projects } from "@/data/projects";
+import type { Project } from "@/data/projects";
 import { ProjectFilters } from "./ProjectFilters";
 import { ProjectGrid } from "./ProjectGrid";
 import { filterProjects, type FilterState } from "@/lib/utils";
@@ -15,14 +15,21 @@ const DEFAULT_FILTERS: FilterState = {
   endDate: "",
 };
 
-const cities = Array.from(new Set(projects.map((p) => p.city))).sort();
+interface ProjectsPageClientProps {
+  projects: Project[];
+}
 
-export function ProjectsPageClient() {
+export function ProjectsPageClient({ projects }: ProjectsPageClientProps) {
+  const cities = useMemo(
+    () => Array.from(new Set(projects.map((p) => p.city))).sort(),
+    [projects]
+  );
+
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
   const filtered = useMemo(
     () => filterProjects(projects, filters),
-    [filters]
+    [projects, filters]
   );
 
   return (

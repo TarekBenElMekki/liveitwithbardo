@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ProjectsPageClient } from "@/components/projects/ProjectsPageClient";
+import { loadProjects } from "@/lib/projects/loader";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("projects");
@@ -11,7 +12,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function OurProjectsPage() {
-  const t = await getTranslations("projects");
+  const [t, projects] = await Promise.all([
+    getTranslations("projects"),
+    loadProjects(),
+  ]);
 
   return (
     <main id="main-content" className="page-top">
@@ -35,7 +39,7 @@ export default async function OurProjectsPage() {
         </div>
       </section>
 
-      <ProjectsPageClient />
+      <ProjectsPageClient projects={projects} />
     </main>
   );
 }
