@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { ArrowLeft, ArrowRight, MapPin, Users, Calendar, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, Users, Calendar, ExternalLink } from "lucide-react";
 import { loadGroupedProjects } from "@/lib/projects/loader";
 import type { GroupedProject, ProjectSlot } from "@/lib/projects/grouped-types";
 import { cn } from "@/lib/utils";
@@ -139,15 +139,10 @@ export default async function ProjectSlugPage({
 
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
-          {(project.totalAvailable != null || project.totalOpenings != null) && (
+          {project.availableSlots > 0 && (
             <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Availability</p>
-              <p className="text-lg font-bold text-gray-900">
-                {project.totalAvailable ?? "—"}
-                {project.totalOpenings != null && (
-                  <span className="text-sm font-normal text-gray-400"> / {project.totalOpenings}</span>
-                )}
-              </p>
+              <p className="text-lg font-bold text-gray-900">{project.availableSlots}</p>
               <p className="text-xs text-gray-400">slots available</p>
             </div>
           )}

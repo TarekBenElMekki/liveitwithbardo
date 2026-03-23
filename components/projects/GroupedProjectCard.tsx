@@ -105,21 +105,12 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
         <h3 className="text-gray-900 font-semibold text-base leading-snug">{project.title}</h3>
 
         {/* Availability */}
-        {(project.totalAvailable != null || project.totalOpenings != null) && (
+        {project.availableSlots > 0 && (
           <div className="flex items-center gap-1.5 text-xs text-gray-500">
             <Users size={11} aria-hidden="true" />
             <span>
-              {project.totalAvailable != null ? (
-                <>
-                  <span className="font-semibold text-gray-800">{project.totalAvailable}</span>
-                  {project.totalOpenings != null && (
-                    <span className="text-gray-400"> / {project.totalOpenings} slots</span>
-                  )}
-                  <span className="text-gray-400"> available</span>
-                </>
-              ) : (
-                <span>{project.totalOpenings} slots</span>
-              )}
+              <span className="font-semibold text-gray-800">{project.availableSlots}</span>
+              <span className="text-gray-400"> slots available</span>
             </span>
           </div>
         )}

@@ -137,6 +137,9 @@ export function transformToGroupedProject(
   const totalOpenings = opp.openings ?? null;
   const totalAvailable = opp.available_openings ?? null;
 
+  // availableSlots = sum of slot.openings across all slots
+  const availableSlots = slots.reduce((sum, s) => sum + (s.openings ?? 0), 0);
+
   // Date range: prefer opp-level fields, fall back to first/last slot
   const firstSlot = slots[0];
   const lastSlot = slots[slots.length - 1];
@@ -188,6 +191,7 @@ export function transformToGroupedProject(
     programme,
     totalOpenings,
     totalAvailable,
+    availableSlots,
     slots,
     fee: extractEurProjectFee(opp.fee_and_health_insurance),
     logistics: {

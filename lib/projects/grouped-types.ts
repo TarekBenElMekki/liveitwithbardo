@@ -38,6 +38,8 @@ export interface GroupedProject {
   totalOpenings: number | null;
   /** Sum of available_openings across all slots */
   totalAvailable: number | null;
+  /** Sum of slot.openings across all slots — used for UI availability display */
+  availableSlots: number;
   /** Per-slot breakdown */
   slots: ProjectSlot[];
   fee: {

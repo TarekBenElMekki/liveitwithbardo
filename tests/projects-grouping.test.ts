@@ -225,6 +225,32 @@ describe("transformToGroupedProject", () => {
     expect(result.totalAvailable).toBe(4);
   });
 
+  it("availableSlots sums slot openings", () => {
+    const result = transformToGroupedProject(makeOpp(), "scale-up");
+    // makeOpp has slots with openings 5 + 5 = 10
+    expect(result.availableSlots).toBe(10);
+  });
+
+  it("availableSlots handles null slot openings", () => {
+    const result = transformToGroupedProject(
+      makeOpp({
+        all_slots: {
+          nodes: [
+            { start_date: "2026-06-01", end_date: "2026-06-30", status: "live", openings: null },
+            { start_date: "2026-07-01", end_date: "2026-07-15", status: "live", openings: 2 },
+          ],
+        },
+      }),
+      "scale-up"
+    );
+    expect(result.availableSlots).toBe(2);
+  });
+
+  it("availableSlots is 0 when no slots", () => {
+    const result = transformToGroupedProject(makeOpp({ all_slots: null }), "scale-up");
+    expect(result.availableSlots).toBe(0);
+  });
+
   it("maps slots correctly", () => {
     const result = transformToGroupedProject(makeOpp(), "scale-up");
     expect(result.slots).toHaveLength(2);
