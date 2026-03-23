@@ -63,6 +63,7 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
             {project.programme || project.category[0].toUpperCase()}
           </span>
         </div>
+
         {/* Status + programme chips */}
         <div className="absolute top-3 right-3 flex gap-1.5 z-10">
           {project.programme && (
