@@ -37,6 +37,8 @@ export function CountryLanguagePicker() {
   const handleContinue = () => {
     saveLocaleAndCountry(locale);
     setVisible(false);
+    // Signal DiscountOverlay to show after language is chosen
+    window.dispatchEvent(new Event("language-chosen"));
 
     if (locale !== currentLocale) {
       const segments = pathname.split("/");
