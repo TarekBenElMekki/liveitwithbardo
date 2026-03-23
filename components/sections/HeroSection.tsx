@@ -61,6 +61,20 @@ export function HeroSection() {
     []
   );
 
+  // Brand layer needs X centering baked into the transform so that
+  // left:50% (mobile) and left:clamp(...) (desktop) both work correctly.
+  // translate3d(calc(-50% + dx), calc(-50% + sy+dy), 0)
+  const applyBrandTransform = useCallback(
+    (el: HTMLDivElement | null, scrollY: number, mx: number, my: number) => {
+      if (!el) return;
+      const sy = scrollY * LAYERS.brand.scrollFactor;
+      const dx = mx * LAYERS.brand.mouseFactor;
+      const dy = my * LAYERS.brand.mouseFactor;
+      el.style.transform = `translate3d(calc(-50% + ${dx}px), calc(-50% + ${sy + dy}px), 0)`;
+    },
+    []
+  );
+
   useEffect(() => {
     // Detect reduced-motion preference
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -91,10 +105,10 @@ export function HeroSection() {
       const scrollY = window.scrollY;
 
       if (prefersReducedMotion.current) {
-        // Reset all transforms
-        [skyRef, fgRef, brandRef].forEach((r) => {
-          if (r.current) r.current.style.transform = "translate3d(0, -50%, 0)";
-        });
+        // Reset all transforms — brand needs -50% X centering preserved
+        if (skyRef.current)   skyRef.current.style.transform   = "translate3d(0, -50%, 0)";
+        if (fgRef.current)    fgRef.current.style.transform    = "translate3d(0, -50%, 0)";
+        if (brandRef.current) brandRef.current.style.transform = "translate3d(-50%, -50%, 0)";
       } else {
         // Ease mouse toward target
         mouseCurrent.current.x += (mouseTarget.current.x - mouseCurrent.current.x) * MOUSE_EASE;
@@ -105,7 +119,7 @@ export function HeroSection() {
 
         applyTransform(skyRef.current,   scrollY, mx, my, LAYERS.sky);
         applyTransform(fgRef.current,    scrollY, mx, my, LAYERS.foreground);
-        applyTransform(brandRef.current, scrollY, mx, my, LAYERS.brand);
+        applyBrandTransform(brandRef.current, scrollY, mx, my);
       }
 
       rafId.current = requestAnimationFrame(tick);
@@ -119,7 +133,7 @@ export function HeroSection() {
       document.removeEventListener("mouseleave", onMouseLeave);
       mq.removeEventListener("change", onMqChange);
     };
-  }, [applyTransform]);
+  }, [applyTransform, applyBrandTransform]);
 
   return (
     <section
@@ -172,20 +186,53 @@ export function HeroSection() {
         }}
       />
 
-      {/* ── 4. Branding mark — sits BEHIND the aqueduct (z-25) ─────────── */}
-      {/*    Horizontal: clamp(5%, calc(44% - 20vw), 45%)                   */}
-      {/*    Vertical: clamp(30svh, calc(50svh - 20svh*(1280px - 100vw)/905px), 50svh) */}
-      {/*      → 50svh on large screens, slides to 30svh on small mobile    */}
-      {/*    Size: min(480px, 72vw) — original size                         */}
-      {/*    Mouse: mouseFactor 28 — clearly interactive on cursor           */}
+      {/*
+       * ── 4. Branding mark — sits BEHIND the aqueduct (z-25) ───────────
+       *
+       * Positioning strategy:
+       *  - top:  clamp(30svh … 50svh) — rises as viewport shrinks (prev commit)
+       *  - left: desktop = clamp(5%, calc(44% - 20vw), 45%)
+       *          phone (≤640px) = 50% — true horizontal center
+       *
+       * Width:
+       *  - desktop/tablet: min(480px, 72vw)
+       *  - phone (≤640px):  min(92vw, 420px) — wider, fills more of the screen
+       *
+       * The RAF loop writes translate3d(dx, calc(-50% + sy+dy), 0).
+       * X = dx is pure mouse wiggle (no centering offset needed — left handles it).
+       * Y = calc(-50% + ...) centers vertically around the `top` anchor.
+       *
+       * On phone, left:50% + the element's own width being centered via the
+       * hero-brand-mobile CSS rule (margin-left: -50% of element width) would
+       * require knowing the width. Instead we use a wrapper approach:
+       * the RAF ref sits on the outer wrapper (handles top/left + transform),
+       * and the inner img wrapper carries the responsive width. The outer
+       * wrapper has zero intrinsic size so -50% Y in transform is fine
+       * (it's relative to the wrapper height = auto = content height).
+       *
+       * Actually simpler: inject a <style> tag with @media to override left
+       * and width on the same element. The RAF transform X (dx) is just a
+       * small mouse wiggle (±28px max) — centering via left:50% is accurate
+       * enough since dx is decorative, not structural.
+       */}
+      <style>{`
+        .hero-brand {
+          left: clamp(5%, calc(44% - 20vw), 45%);
+          width: min(480px, 72vw);
+        }
+        @media (max-width: 640px) {
+          .hero-brand {
+            left: 50%;
+            width: min(92vw, 420px);
+          }
+        }
+      `}</style>
       <div
-        className="absolute z-[25] pointer-events-none"
+        className="hero-brand absolute z-[25] pointer-events-none"
         style={{
-          left: "clamp(5%, calc(44% - 20vw), 45%)",
           top: "clamp(30svh, calc(50svh - 20svh * (1280px - 100vw) / 905px), 50svh)",
           transform: "translate3d(-50%, -50%, 0)",
           willChange: "transform",
-          width: "min(480px, 72vw)",
         }}
         ref={brandRef}
       >
