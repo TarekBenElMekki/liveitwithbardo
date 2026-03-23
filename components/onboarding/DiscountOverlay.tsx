@@ -67,45 +67,30 @@ export function DiscountOverlay() {
           <X size={15} aria-hidden="true" />
         </button>
 
-        <div className="px-7 pt-6 pb-7 flex flex-col items-center gap-4 text-center">
+        <div className="px-7 pt-7 pb-7 flex flex-col items-center gap-5 text-center">
 
           {/* Badge chip */}
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-[var(--red)] text-white text-[11px] font-black tracking-widest uppercase">
             Exclusive Offer
           </span>
 
-          {/* Hero number */}
-          <div className="relative flex items-center justify-center w-full py-2">
-            {/* Soft red glow behind the number */}
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 rounded-2xl"
-              style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(220,38,38,0.10) 0%, transparent 80%)" }}
-            />
-            <span
+          {/* Main text block */}
+          <div className="flex flex-col gap-3">
+            <h2
               id="discount-heading"
-              className="relative font-black text-[var(--red)] leading-none tracking-tighter select-none"
-              style={{ fontSize: "clamp(5rem, 22vw, 7rem)", textShadow: "0 2px 32px rgba(220,38,38,0.18)" }}
-              aria-label="20 percent off"
+              className="text-2xl font-black text-gray-900 leading-tight tracking-tight"
             >
-              20%
-            </span>
+              Don&apos;t Miss Our Exclusive Discounts
+            </h2>
+            <p className="text-sm font-bold text-gray-600 leading-relaxed">
+              Enjoy{" "}
+              <span className="font-black text-[var(--red)]">20% off</span>{" "}
+              for{" "}
+              <span className="font-black text-gray-900">MEAXLDs</span>{" "}
+              and{" "}
+              <span className="font-black text-gray-900">EUROXPRO</span>.
+            </p>
           </div>
-
-          {/* Title */}
-          <h2 className="text-lg font-black text-gray-900 leading-tight tracking-tight -mt-1">
-            Don&apos;t Miss Our Exclusive Discounts
-          </h2>
-
-          {/* Supporting text */}
-          <p className="text-sm font-bold text-gray-600 leading-relaxed">
-            Enjoy{" "}
-            <span className="text-[var(--red)]">20% off</span>{" "}
-            for{" "}
-            <span className="font-black text-gray-900">MEAxLDs</span>{" "}
-            and{" "}
-            <span className="text-gray-900">EUROXPRO</span>.
-          </p>
 
           {/* Thin red rule */}
           <div className="h-px w-10 bg-[var(--red)] opacity-30 rounded-full" aria-hidden="true" />

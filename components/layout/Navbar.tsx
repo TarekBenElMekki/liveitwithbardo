@@ -44,7 +44,7 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
   }, []);
 
   return (
-    <header className="fixed left-0 right-0 z-40 bg-white border-b border-gray-100" style={{ top: "var(--promo-h)" }}>
+    <header className="fixed left-0 right-0 z-40 bg-white" style={{ top: "var(--promo-h)" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
@@ -115,7 +115,7 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
         <nav
           id="mobile-menu"
           aria-label={t("mobileNav")}
-          className="md:hidden border-t border-gray-100 bg-white"
+          className="md:hidden bg-white"
         >
           <ul className="flex flex-col px-4 py-3 gap-0.5">
             {navLinks.map((link) => (
