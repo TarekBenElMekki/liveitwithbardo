@@ -31,9 +31,9 @@ import { useEffect, useRef, useCallback } from "react";
 // scrollFactor: px moved per 1px scrolled (negative = moves up slower than scroll)
 // mouseFactor:  max px offset at screen edge (desktop only)
 const LAYERS = {
-  sky:        { scrollFactor: -0.15, mouseFactor: 8  },
-  foreground: { scrollFactor: -0.30, mouseFactor: 18 },
-  brand:      { scrollFactor: -0.08, mouseFactor: 28 }, // raised from 5 → 28 for noticeable cursor response
+  sky:        { scrollFactor: -0.15, mouseFactor: 16 },
+  foreground: { scrollFactor: -0.30, mouseFactor: 36 },
+  brand:      { scrollFactor: -0.08, mouseFactor: 56 }, // doubled from 28
 } as const;
 
 // Smooth interpolation factor for mouse easing (0 = no movement, 1 = instant)

@@ -1,10 +1,6 @@
 "use client";
 
-import { showPromoBar } from "@/lib/env";
-
 export function PromoBar() {
-  if (!showPromoBar) return null;
-
   return (
     <div
       role="banner"
