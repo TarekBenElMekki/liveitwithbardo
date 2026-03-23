@@ -173,14 +173,16 @@ export function HeroSection() {
       />
 
       {/* ── 4. Branding mark — sits BEHIND the aqueduct (z-25) ─────────── */}
-      {/*    Position: calc(44% - 20vw) = previous (44% - 30vw) + 10vw     */}
-      {/*    Size: min(480px, 72vw) — restored to original (pre-enlargement) */}
+      {/*    Horizontal: clamp(5%, calc(44% - 20vw), 45%)                   */}
+      {/*    Vertical: clamp(30svh, calc(50svh - 20svh*(1280px - 100vw)/905px), 50svh) */}
+      {/*      → 50svh on large screens, slides to 30svh on small mobile    */}
+      {/*    Size: min(480px, 72vw) — original size                         */}
       {/*    Mouse: mouseFactor 28 — clearly interactive on cursor           */}
       <div
         className="absolute z-[25] pointer-events-none"
         style={{
           left: "clamp(5%, calc(44% - 20vw), 45%)",
-          top: "50%",
+          top: "clamp(30svh, calc(50svh - 20svh * (1280px - 100vw) / 905px), 50svh)",
           transform: "translate3d(-50%, -50%, 0)",
           willChange: "transform",
           width: "min(480px, 72vw)",
