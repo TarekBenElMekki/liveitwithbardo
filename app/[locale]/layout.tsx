@@ -8,7 +8,7 @@ import { ChatAgent } from "@/components/chat/ChatAgent";
 import { CountryLanguagePicker } from "@/components/onboarding/CountryLanguagePicker";
 import { PromoBar } from "@/components/layout/PromoBar";
 import { locales, type Locale } from "@/i18n/config";
-import { appUrl, showChatAgent, isProduction } from "@/lib/env";
+import { appUrl, showChatAgent, showProductionNav } from "@/lib/env";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
@@ -66,7 +66,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages}>
       {/* PromoBar self-guards via NEXT_PUBLIC_SHOW_PROMO_BAR */}
       <PromoBar />
-      <Navbar isProduction={isProduction} />
+      <Navbar isProduction={showProductionNav} />
       {children}
       <Footer />
       {/* ChatAgent controlled by NEXT_PUBLIC_SHOW_CHAT_AGENT */}

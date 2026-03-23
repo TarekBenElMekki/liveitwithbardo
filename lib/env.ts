@@ -42,6 +42,14 @@ export const appUrl =
 /** Whether to render the PromoBar countdown banner. Defaults to true. */
 export const showPromoBar = process.env.NEXT_PUBLIC_SHOW_PROMO_BAR !== "false";
 
+/**
+ * Whether the navbar should show only production-visible links.
+ * Decoupled from isProduction so staging can mirror the production nav
+ * without affecting middleware route-guarding (which still uses APP_ENV).
+ * Defaults to true (safe — shows filtered nav if flag is unset).
+ */
+export const showProductionNav = process.env.NEXT_PUBLIC_PRODUCTION_NAV !== "false";
+
 /** ISO date string for the PromoBar countdown target. */
 export const promoTargetDate =
   process.env.NEXT_PUBLIC_PROMO_TARGET_DATE ?? "2026-05-15T09:00:00Z";
