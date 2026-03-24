@@ -35,14 +35,24 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <span className="text-gray-400 cursor-default" aria-label={t("instagram")}>
+                <a
+                  href="https://www.instagram.com/volunteer_in_tunisia?igsh=YnVhYjdmb2tvNTB4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gray-900 transition-colors duration-150 focus-ring rounded-md"
+                >
                   {t("instagram")}
-                </span>
+                </a>
               </li>
               <li>
-                <span className="text-gray-400 cursor-default" aria-label={t("contact")}>
+                <a
+                  href="https://docs.google.com/spreadsheets/d/1huQip4OHIxar4HCKTmvKiW0h_mFUUdm7Y38jDq8CCRQ/edit?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gray-900 transition-colors duration-150 focus-ring rounded-md"
+                >
                   {t("contact")}
-                </span>
+                </a>
               </li>
             </ul>
           </nav>
