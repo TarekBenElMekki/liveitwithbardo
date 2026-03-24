@@ -74,11 +74,27 @@ export function DiscountOverlay() {
             Exclusive Offer
           </span>
 
+          {/* Hero number */}
+          <div className="relative flex items-center justify-center w-full py-1">
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-2xl"
+              style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, rgba(220,38,38,0.10) 0%, transparent 80%)" }}
+            />
+            <span
+              className="relative font-black text-[var(--red)] leading-none tracking-tighter select-none"
+              style={{ fontSize: "clamp(4.5rem, 20vw, 6.5rem)", textShadow: "0 2px 28px rgba(220,38,38,0.18)" }}
+              aria-hidden="true"
+            >
+              20%
+            </span>
+          </div>
+
           {/* Main text block */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             <h2
               id="discount-heading"
-              className="text-2xl font-black text-gray-900 leading-tight tracking-tight"
+              className="text-xl font-black text-gray-900 leading-tight tracking-tight"
             >
               Don&apos;t Miss Our Exclusive Discounts
             </h2>
