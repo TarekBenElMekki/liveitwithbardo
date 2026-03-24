@@ -37,7 +37,7 @@ export function CtaSection() {
             href={`/${currentLocale}/our-projects`}
             className="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-white text-accent font-semibold text-sm hover:bg-gray-100 transition-colors duration-150 focus-ring shadow-sm"
           >
-            Apply for an Exchange
+            Live It With Bardo
           </Link>
         </div>
 
