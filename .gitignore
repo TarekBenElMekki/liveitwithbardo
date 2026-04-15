@@ -8,3 +8,23 @@ yarn-error.log
 dist
 out
 coverage
+
+# local env / backups
+.env*
+!.env.production.example
+!.env.staging.example
+
+# vercel local files
+.vercel/
+
+# exports / temp bundles
+.project-export/
+
+# test artifacts
+playwright-report/
+test-results/
+coverage/
+
+# ts incremental cache
+*.tsbuildinfo
+tsconfig.tsbuildinfo
