@@ -47,13 +47,14 @@ function SlotRow({ slot }: { slot: ProjectSlot }) {
         {hasDate ? (
           <span>
             <span className="font-medium">{fmtDate(slot.startDate)}</span>
-            <span className="text-gray-400 mx-1">â€”</span>
+            <span className="text-gray-400 mx-1">-</span>
             <span className="font-medium">{fmtDate(slot.endDate)}</span>
           </span>
         ) : (
           <span className="text-gray-400 italic">Dates to be confirmed</span>
         )}
       </div>
+
       {slot.openings != null && (
         <div className="flex items-center gap-1 text-xs text-gray-500 shrink-0">
           <Users size={11} aria-hidden="true" />
@@ -148,7 +149,7 @@ export default async function ProjectSlugPage({
             <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Project Fee</p>
               <p className="text-lg font-bold text-gray-900">
-                â‚¬{project.fee.amount}
+                EUR {project.fee.amount}
                 <span className="text-sm font-normal text-gray-400 ml-1">EUR</span>
               </p>
             </div>

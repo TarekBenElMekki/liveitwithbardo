@@ -107,7 +107,7 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
           <div className="flex items-center gap-2">
             <Calendar size={14} className="shrink-0" aria-hidden="true" />
             <span>
-              {fmtDate(project.startDate || null)} â€” {fmtDate(project.endDate || null)}
+              {fmtDate(project.startDate || null)} - {fmtDate(project.endDate || null)}
             </span>
           </div>
 
@@ -171,7 +171,7 @@ export function GroupedProjectCard({ project, locale }: GroupedProjectCardProps)
             <span
               className="relative z-10 inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-gray-100 text-gray-400 cursor-not-allowed shrink-0"
               aria-label="Apply not available for this programme"
-              title={`Apply via AIESEC for ${project.programme || "this programme"} â€” not available here`}
+              title={`Apply via AIESEC for ${project.programme || "this programme"} - not available here`}
             >
               Apply on aiesec.org
               <ExternalLink size={11} aria-hidden="true" />
