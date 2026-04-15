@@ -1,136 +1,75 @@
-import type { Project } from "@/data/projects";
+import type { Project, SDG } from "@/data/projects";
 import type { GisOpportunity } from "./gis-types";
 
-/**
- * Normalises a date value from the GIS API to ISO YYYY-MM-DD.
- * Falls back to today if null/unparseable.
- */
-function normaliseDate(raw: string | null | undefined): string {
-  if (!raw?.trim()) return new Date().toISOString().slice(0, 10);
-  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
-  const parsed = new Date(raw);
-  if (!isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
-  return new Date().toISOString().slice(0, 10);
-}
-
-/**
- * Slugifies a string: lowercase, spaces → hyphens, strip non-alphanumeric.
- */
-function slugify(str: string): string {
-  return str
+function slugify(value: string) {
+  return value
     .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
 }
 
-/**
- * Maps a GIS programme id to a ProjectCategory.
- * GV (programme 7) → "volunteer"
- * GT (programme 8) → "internship"
- * GE (programme 9) → "internship"
- * Default → "volunteer"
- */
-function mapCategory(opp: GisOpportunity): "volunteer" | "internship" | "cultural" {
+function mapCategory(opp: GisOpportunity): "volunteer" | "talent" | "teaching" {
   const id = opp.programme?.id;
-  if (id === "8" || id === "9") return "internship";
+
+  if (id === "7") return "volunteer";
+  if (id === "8") return "talent";
+  if (id === "9") return "teaching";
+
   return "volunteer";
 }
 
-/**
- * Builds a concise card-friendly description from GIS opportunity fields.
- */
-function buildDescription(opp: GisOpportunity): string {
-  const parts: string[] = [];
-
-  if (opp.description?.trim()) {
-    const stripped = opp.description.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-    if (stripped.length > 0) parts.push(stripped.slice(0, 300));
-  }
-
-  const logistics: string[] = [];
-  const li = opp.logistics_info;
-  if (li?.accommodation_covered === "covered") logistics.push("accommodation");
-  if (li?.food_covered === "covered") logistics.push("meals");
-  if (li?.transportation_covered === "covered") logistics.push("transportation");
-  if (logistics.length > 0) parts.push(`Includes: ${logistics.join(", ")}.`);
-
-  // fee_and_health_insurance is a JSON scalar — access as plain object
-  const fee = opp.fee_and_health_insurance as {
-    programme_fee?: number | null;
-    total?: number | null;
-    currency?: string | null;
-  } | null;
-  const feeAmount = fee?.total ?? fee?.programme_fee;
-  if (feeAmount && feeAmount > 0) {
-    const currency = fee?.currency ?? "TND";
-    parts.push(`Programme fee: ${feeAmount} ${currency}.`);
-  }
-
-  return parts.join(" ") || "AIESEC opportunity in Tunisia.";
+function isSDG(value: number): value is SDG {
+  return Number.isInteger(value) && value >= 1 && value <= 17;
 }
 
-/**
- * Derives the city/location from the host LC name.
- */
-function deriveCity(opp: GisOpportunity): string {
-  const name = opp.host_lc?.name?.trim();
-  if (!name) return "Tunisia";
-  return name.replace(/^aiesec\s+(in\s+)?/i, "").trim() || "Tunisia";
+function extractSdgs(opp: GisOpportunity): SDG[] {
+  const raw = opp.sdg_info?.sdg_target?.goal_index;
+
+  if (mapCategory(opp) !== "volunteer") {
+    return [];
+  }
+
+  return typeof raw === "number" && isSDG(raw) ? [raw] : [];
 }
 
-/**
- * Transforms a raw GIS opportunity into the Project shape used by the UI.
- *
- * Direct mappings:
- *  id          ← "opp-" + opp.id
- *  slug        ← slugify(id + title)
- *  title       ← opp.title
- *  description ← built from description + logistics + fee
- *  isOpen      ← status === "open" && available_openings > 0
- *  startDate   ← earliest_start_date or first slot start_date
- *  endDate     ← latest_end_date or first slot end_date
- *  category    ← derived from programme id
- *  city        ← derived from host_lc.name
- *  sdgs        ← sdg_info.sdg_target.goal_index
- *  image       ← cover_photo.url (JSON scalar)
- */
+function pickPrimarySlot(opp: GisOpportunity) {
+  const slots = opp.all_slots?.nodes ?? [];
+  return slots.find((slot) => slot.status === "live") ?? slots[0] ?? null;
+}
+
+function buildDescription(opp: GisOpportunity) {
+  const base = (opp.description ?? "").replace(/\s+/g, " ").trim();
+  const logistics = [];
+
+  if (opp.logistics_info?.accommodation_covered === "covered") logistics.push("accommodation");
+  if (opp.logistics_info?.food_covered === "covered") logistics.push("meals");
+  if (opp.logistics_info?.transportation_covered === "covered") logistics.push("transportation");
+
+  const extras = [];
+  if (logistics.length > 0) extras.push(`Includes: ${logistics.join(", ")}.`);
+  if (opp.fee_and_health_insurance?.total) {
+    extras.push(`Programme fee: ${opp.fee_and_health_insurance.total} ${opp.fee_and_health_insurance.currency ?? ""}.`.trim());
+  }
+
+  return [base, ...extras].filter(Boolean).join(" ").trim();
+}
+
 export function transformGisOpportunity(opp: GisOpportunity): Project {
-  const title = opp.title?.trim() || "Untitled Opportunity";
-
-  const firstSlot = opp.all_slots?.nodes?.[0];
-  const startDate = normaliseDate(opp.earliest_start_date ?? firstSlot?.start_date);
-  const endDate = normaliseDate(opp.latest_end_date ?? firstSlot?.end_date);
-
-  const isOpen =
-    opp.status === "open" &&
-    (opp.available_openings == null || opp.available_openings > 0);
-
-  // SDG: sdg_info.sdg_target.goal_index is the SDG number (1–17)
-  const goalIndex = opp.sdg_info?.sdg_target?.goal_index;
-  const sdgs: Project["sdgs"] =
-    goalIndex != null && goalIndex >= 1 && goalIndex <= 17
-      ? [goalIndex as Project["sdgs"][number]]
-      : [];
-
-  // cover_photo is a JSON scalar — access as plain object
-  const coverPhoto = opp.cover_photo as { url?: string } | null;
-  const image = coverPhoto?.url ?? "";
+  const slot = pickPrimarySlot(opp);
 
   return {
     id: `opp-${opp.id}`,
-    slug: slugify(`${opp.id}-${title}`),
-    title,
+    slug: `${opp.id}-${slugify(opp.title ?? "opportunity")}`,
+    title: opp.title ?? "Untitled opportunity",
     description: buildDescription(opp),
-    image,
-    alt: "",
-    sdgs,
-    startDate,
-    endDate,
-    city: deriveCity(opp),
+    image: opp.cover_photo?.url ?? "/hero/hero_static_default.png",
+    alt: opp.cover_photo?.filename ?? "",
+    sdgs: extractSdgs(opp),
+    startDate: slot?.start_date ?? opp.earliest_start_date ?? "",
+    endDate: slot?.end_date ?? opp.latest_end_date ?? "",
+    city: opp.host_lc?.name ?? "",
     category: mapCategory(opp),
-    isOpen,
+    isOpen: opp.status === "open" && (opp.available_openings ?? 0) > 0,
   };
 }

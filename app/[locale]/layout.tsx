@@ -6,7 +6,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ChatAgent } from "@/components/chat/ChatAgent";
 import { CountryLanguagePicker } from "@/components/onboarding/CountryLanguagePicker";
-import { PromoBar } from "@/components/layout/PromoBar";
 import { locales, type Locale } from "@/i18n/config";
 import { appUrl, showChatAgent, showProductionNav } from "@/lib/env";
 
@@ -64,12 +63,9 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      {/* PromoBar self-guards via NEXT_PUBLIC_SHOW_PROMO_BAR */}
-      <PromoBar />
       <Navbar isProduction={showProductionNav} />
       {children}
       <Footer />
-      {/* ChatAgent controlled by NEXT_PUBLIC_SHOW_CHAT_AGENT */}
       {showChatAgent && <ChatAgent />}
       <CountryLanguagePicker />
     </NextIntlClientProvider>

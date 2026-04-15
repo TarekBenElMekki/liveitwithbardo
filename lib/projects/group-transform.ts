@@ -1,237 +1,221 @@
-/**
- * Transforms raw GIS opportunities into GroupedProject objects.
- * One GIS opportunity = one GroupedProject (slots are nested, not separate rows).
- */
-
-import type { GisOpportunity } from "./gis-types";
+import type { ProjectCategory, SDG } from "@/data/projects";
 import type { GroupedProject, ProjectSlot } from "./grouped-types";
-import type { SDG, ProjectCategory } from "@/data/projects";
+import type { GisOpportunity } from "./gis-types";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-/**
- * Removes content inside square brackets (including the brackets) and trims.
- * "Scale Up! [6 weeks]" → "Scale Up!"
- * "Global Classroom [6 weeks]" → "Global Classroom"
- */
-export function cleanTitle(raw: string): string {
-  return raw.replace(/\s*\[.*?\]\s*/g, " ").trim().replace(/\s+/g, " ");
+function stripBracketSuffix(value: string) {
+  return value.replace(/\[[^\]]*\]/g, " ").replace(/\s+/g, " ").trim();
 }
 
-/**
- * Slugifies a string: lowercase, spaces → hyphens, strip non-alphanumeric.
- */
-export function slugify(str: string): string {
-  return str
+function slugify(value: string) {
+  return value
     .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-/**
- * Normalises a date value to ISO YYYY-MM-DD, or returns null if missing.
- */
-function normaliseDate(raw: string | null | undefined): string | null {
-  if (!raw?.trim()) return null;
-  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
-  const parsed = new Date(raw);
-  if (!isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
-  return null;
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
 }
 
 function mapCategory(opp: GisOpportunity): ProjectCategory {
   const id = opp.programme?.id;
-  if (id === "8" || id === "9") return "internship";
+
+  if (id === "7") return "volunteer";
+  if (id === "8") return "talent";
+  if (id === "9") return "teaching";
+
   return "volunteer";
 }
 
-function deriveCity(opp: GisOpportunity): string {
-  const name = opp.host_lc?.name?.trim();
-  if (!name) return "Tunisia";
-  return name.replace(/^aiesec\s+(in\s+)?/i, "").trim() || "Tunisia";
+function isSDG(value: number): value is SDG {
+  return Number.isInteger(value) && value >= 1 && value <= 17;
 }
 
-function buildDescription(opp: GisOpportunity): string {
-  const parts: string[] = [];
-  if (opp.description?.trim()) {
-    const stripped = opp.description.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-    if (stripped) parts.push(stripped.slice(0, 300));
+function extractSdgs(opp: GisOpportunity): SDG[] {
+  const raw = opp.sdg_info?.sdg_target?.goal_index;
+
+  if (mapCategory(opp) !== "volunteer") {
+    return [];
   }
-  const li = opp.logistics_info;
-  const covered: string[] = [];
-  if (li?.accommodation_covered === "covered") covered.push("accommodation");
-  if (li?.food_covered === "covered") covered.push("meals");
-  if (li?.transportation_covered === "covered") covered.push("transportation");
-  if (covered.length) parts.push(`Includes: ${covered.join(", ")}.`);
-  return parts.join(" ") || "AIESEC opportunity in Tunisia.";
+
+  return typeof raw === "number" && isSDG(raw) ? [raw] : [];
 }
 
-/**
- * Extracts the Project Fee in EUR from the fee_and_health_insurance JSON scalar.
- *
- * Strategy:
- *  1. If `project_fee` is set AND `currency` is "EUR" → use project_fee as EUR amount.
- *  2. If `project_fee` is null but `programme_fee` is set AND `currency` is "EUR"
- *     → fall back to programme_fee (same currency, different label).
- *  3. If currency is NOT "EUR" (e.g. TND) → return null.
- *     We do NOT invent conversion rates. The UI will hide the fee section.
- *
- * The GIS API fee_and_health_insurance scalar shape (observed):
- *   { project_fee, programme_fee, total, currency, country }
- */
-function extractEurProjectFee(raw: unknown): { amount: number | null; currency: "EUR" | null } {
-  if (!raw || typeof raw !== "object") return { amount: null, currency: null };
-  const fee = raw as {
-    project_fee?: number | null;
-    programme_fee?: number | null;
-    total?: number | null;
-    currency?: string | null;
-  };
+function getProgrammeDisplay(
+  programme: { id: string; short_name: string | null } | null | undefined
+) {
+  const p = programme as
+    | ({ id: string; short_name: string | null; short_name_display?: string | null })
+    | null
+    | undefined;
 
-  const isEur = fee.currency?.toUpperCase() === "EUR";
-  if (!isEur) {
-    // Currency is not EUR — do not display or convert
+  return p?.short_name_display ?? p?.short_name ?? "";
+}
+
+function buildDescription(opp: GisOpportunity) {
+  const base = (opp.description ?? "").replace(/\s+/g, " ").trim();
+  const logistics = [];
+
+  if (opp.logistics_info?.accommodation_covered === "covered") logistics.push("accommodation");
+  if (opp.logistics_info?.food_covered === "covered") logistics.push("meals");
+  if (opp.logistics_info?.transportation_covered === "covered") logistics.push("transportation");
+
+  const extras = [];
+  if (logistics.length > 0) extras.push(`Includes: ${logistics.join(", ")}.`);
+  if (opp.fee_and_health_insurance?.total) {
+    extras.push(`Programme fee: ${opp.fee_and_health_insurance.total} ${opp.fee_and_health_insurance.currency ?? ""}.`.trim());
+  }
+
+  return [base, ...extras].filter(Boolean).join(" ").trim();
+}
+
+
+
+function toProjectSlot(opp: GisOpportunity): ProjectSlot[] {
+  const nodes = opp.all_slots?.nodes ?? [];
+  return nodes.map((slot) => ({
+    startDate: slot.start_date ?? null,
+    endDate: slot.end_date ?? null,
+    openings: slot.openings ?? null,
+    available: null,
+  }));
+}
+
+function getEarliestStartSafe(opp: GisOpportunity): string {
+  const nodes = opp.all_slots?.nodes ?? [];
+  const starts = nodes
+    .map((slot) => slot.start_date)
+    .filter((value): value is string => typeof value === "string");
+
+  if (starts.length === 0) {
+    return opp.earliest_start_date ?? "";
+  }
+
+  return starts.sort()[0] ?? opp.earliest_start_date ?? "";
+}
+
+function getLatestEndSafe(opp: GisOpportunity): string {
+  const nodes = opp.all_slots?.nodes ?? [];
+  const ends = nodes
+    .map((slot) => slot.end_date)
+    .filter((value): value is string => typeof value === "string");
+
+  if (ends.length === 0) {
+    return opp.latest_end_date ?? "";
+  }
+
+  return ends.sort()[ends.length - 1] ?? opp.latest_end_date ?? "";
+}
+
+function hasSlots(opp: GisOpportunity) {
+  const nodes = opp.all_slots?.nodes ?? [];
+  return nodes.length > 0 || !!opp.earliest_start_date || !!opp.latest_end_date;
+}
+
+function getTotalAvailable(opp: GisOpportunity) {
+  const nodes = opp.all_slots?.nodes ?? [];
+  if (nodes.length === 0) {
+    return opp.available_openings ?? null;
+  }
+
+  if (typeof opp.available_openings === "number") {
+    return opp.available_openings;
+  }
+
+  return null;
+}
+
+function getTotalOpenings(opp: GisOpportunity) {
+  const nodes = opp.all_slots?.nodes ?? [];
+  if (nodes.length === 0) {
+    return opp.openings ?? null;
+  }
+
+  const sum = nodes.reduce((acc, slot) => acc + (slot.openings ?? 0), 0);
+  return sum > 0 ? sum : null;
+}
+
+function getAvailableSlots(opp: GisOpportunity) {
+  const nodes = opp.all_slots?.nodes ?? [];
+  return nodes.reduce((acc, slot) => acc + ((slot.openings ?? 0) > 0 ? 1 : 0), 0);
+}
+
+function getProjectFee(opp: GisOpportunity): GroupedProject["fee"] {
+  const fee = opp.fee_and_health_insurance;
+
+  if (!fee || fee.currency !== "EUR") {
     return { amount: null, currency: null };
   }
 
-  // Prefer project_fee, fall back to programme_fee
-  const amount = fee.project_fee ?? fee.programme_fee ?? null;
-  if (amount == null || amount <= 0) return { amount: null, currency: null };
-  return { amount, currency: "EUR" };
+  if (fee.project_fee != null) {
+    return { amount: fee.project_fee, currency: "EUR" };
+  }
+
+  if (fee.programme_fee != null) {
+    return { amount: fee.programme_fee, currency: "EUR" };
+  }
+
+  return { amount: null, currency: null };
 }
 
-/**
- * Returns true if the opportunity has at least one slot.
- * Used to filter out slot-less opportunities before they reach the UI.
- */
-export function hasSlots(opp: GisOpportunity): boolean {
-  return (opp.all_slots?.nodes?.length ?? 0) > 0;
-}
-
-// ── Main transform ────────────────────────────────────────────────────────────
-
-/**
- * Transforms a single GIS opportunity into a GroupedProject.
- * Slug is title-only (no OPP ID prefix) — caller must handle deduplication.
- */
-export function transformToGroupedProject(
-  opp: GisOpportunity,
-  slug: string
-): GroupedProject {
-  const rawTitle = opp.title?.trim() || "Untitled Opportunity";
-  const title = cleanTitle(rawTitle);
-  const oppId = String(opp.id);
-
-  // Slots
-  const slots: ProjectSlot[] = (opp.all_slots?.nodes ?? []).map((s) => ({
-    startDate: normaliseDate(s.start_date),
-    endDate: normaliseDate(s.end_date),
-    openings: s.openings ?? null,
-    available: null, // slot-level available not exposed by GIS API; use opp-level totals
-  }));
-
-  // Totals — opp-level fields (GIS doesn't expose per-slot available_openings)
-  const totalOpenings = opp.openings ?? null;
-  const totalAvailable = opp.available_openings ?? null;
-
-  // availableSlots = sum of slot.openings across all slots
-  const availableSlots = slots.reduce((sum, s) => sum + (s.openings ?? 0), 0);
-
-  // Date range: prefer opp-level fields, fall back to first/last slot
-  const firstSlot = slots[0];
-  const lastSlot = slots[slots.length - 1];
-  const startDate =
-    normaliseDate(opp.earliest_start_date) ??
-    firstSlot?.startDate ??
-    new Date().toISOString().slice(0, 10);
-  const endDate =
-    normaliseDate(opp.latest_end_date) ??
-    lastSlot?.endDate ??
-    new Date().toISOString().slice(0, 10);
-
-  const isOpen =
-    opp.status === "open" &&
-    (opp.available_openings == null || opp.available_openings > 0);
-
-  const goalIndex = opp.sdg_info?.sdg_target?.goal_index;
-  const sdgs: SDG[] =
-    goalIndex != null && goalIndex >= 1 && goalIndex <= 17
-      ? [goalIndex as SDG]
-      : [];
-
-  const coverPhoto = opp.cover_photo as { url?: string } | null;
-  const image = coverPhoto?.url ?? "";
-
-  const li = opp.logistics_info;
-  const programme = opp.programme?.short_name ?? "";
-
-  // External apply URL — GV only
-  const externalApplyUrl =
-    programme.toUpperCase() === "GV"
-      ? `https://aiesec.org/opportunity/global-volunteer/${oppId}`
-      : null;
-
+function getLogistics(opp: GisOpportunity): GroupedProject["logistics"] {
   return {
-    id: `opp-${oppId}`,
-    oppId,
-    slug,
-    title,
-    description: buildDescription(opp),
-    image,
-    alt: "",
-    sdgs,
-    startDate,
-    endDate,
-    city: deriveCity(opp),
-    category: mapCategory(opp),
-    isOpen,
-    programme,
-    totalOpenings,
-    totalAvailable,
-    availableSlots,
-    slots,
-    fee: extractEurProjectFee(opp.fee_and_health_insurance),
-    logistics: {
-      accommodation: li?.accommodation_covered === "covered",
-      food: li?.food_covered === "covered",
-      transport: li?.transportation_covered === "covered",
-    },
-    externalApplyUrl,
+    accommodation: opp.logistics_info?.accommodation_covered === "covered",
+    food: opp.logistics_info?.food_covered === "covered",
+    transport: opp.logistics_info?.transportation_covered === "covered",
   };
 }
 
-/**
- * Transforms a list of GIS opportunities into GroupedProjects.
- *
- * Slug strategy:
- *  - Base slug = slugify(cleanTitle(opp.title))
- *  - If two opps share the same base slug, the second gets "-2", third "-3", etc.
- *  - This is deterministic as long as the API returns opps in a stable order
- *    (which it does — sorted by ID).
- *  - Opps with no slots are excluded entirely.
- */
+function getExternalApplyUrl(opp: GisOpportunity) {
+  return opp.programme?.id === "7"
+    ? `https://aiesec.org/opportunity/global-volunteer/${opp.id}`
+    : null;
+}
+
+export function transformToGroupedProject(
+  opp: GisOpportunity,
+  fallbackSlug?: string
+): GroupedProject {
+  const title = stripBracketSuffix(opp.title ?? "Untitled opportunity");
+  const programme = getProgrammeDisplay(opp.programme);
+  const cleanSlugBase = fallbackSlug || slugify(`${opp.id}-${title || "opportunity"}`);
+
+  return {
+    id: `opp-${opp.id}`,
+    oppId: String(opp.id),
+    slug: cleanSlugBase,
+    title,
+    description: buildDescription(opp),
+    image: opp.cover_photo?.url ?? "/hero/hero_static_default.png",
+    alt: opp.cover_photo?.filename ?? "",
+    sdgs: extractSdgs(opp),
+    startDate: getEarliestStartSafe(opp),
+    endDate: getLatestEndSafe(opp),
+    city: opp.host_lc?.name ?? "",
+    category: mapCategory(opp),
+    isOpen: opp.status === "open" && (opp.available_openings ?? 0) > 0,
+    programme,
+    totalOpenings: getTotalOpenings(opp),
+    totalAvailable: getTotalAvailable(opp),
+    availableSlots: getAvailableSlots(opp),
+    slots: toProjectSlot(opp),
+    fee: getProjectFee(opp),
+    logistics: getLogistics(opp),
+    externalApplyUrl: getExternalApplyUrl(opp),
+  };
+}
+
+export function transformGisOpportunityToGrouped(opp: GisOpportunity): GroupedProject {
+  return transformToGroupedProject(
+    opp,
+    slugify(`${opp.id}-${stripBracketSuffix(opp.title ?? "opportunity")}`)
+  );
+}
+
 export function transformAllToGroupedProjects(opps: GisOpportunity[]): GroupedProject[] {
-  const slugCounts = new Map<string, number>();
-  const result: GroupedProject[] = [];
-
-  for (const opp of opps) {
-    // Phase 5: skip opportunities with no slots
-    if (!hasSlots(opp)) continue;
-
-    const rawTitle = opp.title?.trim() || "Untitled Opportunity";
-    const baseSlug = slugify(cleanTitle(rawTitle));
-
-    const count = slugCounts.get(baseSlug) ?? 0;
-    slugCounts.set(baseSlug, count + 1);
-
-    // First occurrence gets the clean slug; duplicates get a numeric suffix
-    const slug = count === 0 ? baseSlug : `${baseSlug}-${count + 1}`;
-
-    result.push(transformToGroupedProject(opp, slug));
-  }
-
-  return result;
+  return opps
+    .filter(hasSlots)
+    .map((opp) =>
+      transformToGroupedProject(
+        opp,
+        slugify(`${opp.id}-${stripBracketSuffix(opp.title ?? "opportunity")}`)
+      )
+    );
 }

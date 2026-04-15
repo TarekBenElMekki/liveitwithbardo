@@ -2,7 +2,6 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { StatsSection } from "@/components/sections/StatsSection";
 import { GlobeSection } from "@/components/globe/GlobeSection";
 import { CtaSection } from "@/components/sections/CtaSection";
-import { DiscountOverlay } from "@/components/onboarding/DiscountOverlay";
 
 export default function HomePage() {
   return (
@@ -11,7 +10,6 @@ export default function HomePage() {
       <StatsSection />
       <GlobeSection />
       <CtaSection />
-      <DiscountOverlay />
     </main>
   );
 }

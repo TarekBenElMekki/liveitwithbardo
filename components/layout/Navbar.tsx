@@ -13,19 +13,17 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
 
-  // Extract current locale from pathname (/en/..., /fr/..., /ar/...)
   const segments = pathname.split("/");
   const currentLocale = (locales.includes(segments[1] as Locale) ? segments[1] : "en") as Locale;
 
-  // Build locale-prefixed href
   const localePath = (path: string) => `/${currentLocale}${path}`;
 
   const allNavLinks = [
-    { href: localePath(""),              label: t("home"),      productionVisible: true },
+    { href: localePath(""), label: t("home"), productionVisible: true },
     { href: localePath("/discover-bardo"), label: t("discover"), productionVisible: false },
-    { href: localePath("/our-projects"),   label: t("projects"), productionVisible: true },
+    { href: localePath("/our-projects"), label: t("projects"), productionVisible: true },
     { href: localePath("/tunisian-lifestyle"), label: t("lifestyle"), productionVisible: false },
-    { href: localePath("/faq"),            label: t("faq"),      productionVisible: false },
+    { href: localePath("/faq"), label: t("faq"), productionVisible: false },
   ];
 
   const navLinks = isProduction
@@ -44,28 +42,25 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
   }, []);
 
   return (
-    <header className="fixed left-0 right-0 z-50 bg-white" style={{ top: "var(--promo-h)" }}>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
-          {/* Logo */}
+        <div className="flex items-center justify-between h-20">
           <Link
             href={localePath("")}
-            className="flex items-center gap-2 focus-ring rounded-md"
+            className="flex items-center gap-3 focus-ring rounded-md"
             aria-label={t("logoLabel")}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logos/aiesec-human-blue.svg" alt="" aria-hidden="true" className="h-9 w-auto" />
-            <span className="text-gray-900 font-semibold text-sm tracking-tight">in Bardo</span>
+            <img src="/logos/aiesec-human-blue.svg" alt="" aria-hidden="true" className="h-10 w-auto" />
+            <span className="text-gray-900 font-semibold text-[1.05rem] tracking-tight">in Bardo</span>
           </Link>
 
-          {/* Desktop nav */}
-          <nav aria-label={t("mainNav")} className="hidden md:flex items-center gap-1">
+          <nav aria-label={t("mainNav")} className="hidden md:flex items-center gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-sm transition-colors duration-150 focus-ring rounded-md px-3 py-1.5",
+                  "text-base transition-colors duration-150 focus-ring rounded-md px-4 py-2",
                   isActive(link.href)
                     ? "text-gray-900 font-medium"
                     : "text-gray-500 hover:text-gray-900"
@@ -76,27 +71,25 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
               </Link>
             ))}
 
-            {/* Language switcher */}
             <button
               type="button"
               onClick={openPicker}
               aria-label={t("changeLanguageLabel")}
               title={t("changeLanguage")}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors focus-ring rounded-md px-3 py-1.5 ml-1"
+              className="flex items-center gap-2 text-base text-gray-500 hover:text-gray-900 transition-colors focus-ring rounded-md px-4 py-2 ml-1"
             >
-              <Globe size={14} aria-hidden="true" />
-              <span className="uppercase text-xs font-semibold tracking-wide">{currentLocale}</span>
+              <Globe size={16} aria-hidden="true" />
+              <span className="uppercase text-sm font-semibold tracking-wide">{currentLocale}</span>
             </button>
 
             <Link
               href={localePath("/our-projects")}
-              className="ml-3 px-4 py-2 rounded-full bg-accent text-white text-sm font-semibold hover:bg-[var(--accent-dark)] transition-colors duration-150 focus-ring"
+              className="ml-4 px-6 py-3 rounded-full bg-accent text-white text-base font-semibold hover:bg-[var(--accent-dark)] transition-colors duration-150 focus-ring"
             >
               {t("applyNow")}
             </Link>
           </nav>
 
-          {/* Mobile menu button */}
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
@@ -105,19 +98,18 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
             aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
             className="md:hidden p-2 rounded-md text-gray-500 hover:text-gray-900 focus-ring"
           >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <nav
           id="mobile-menu"
           aria-label={t("mobileNav")}
-          className="md:hidden bg-white"
+          className="md:hidden bg-white border-t border-gray-100"
         >
-          <ul className="flex flex-col px-4 py-3 gap-0.5">
+          <ul className="flex flex-col px-4 py-4 gap-1">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
@@ -125,7 +117,7 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
                   onClick={() => setMenuOpen(false)}
                   aria-current={isActive(link.href) ? "page" : undefined}
                   className={cn(
-                    "block py-2.5 text-sm transition-colors focus-ring rounded-md px-2",
+                    "block py-3 text-base transition-colors focus-ring rounded-md px-2",
                     isActive(link.href)
                       ? "text-gray-900 font-medium"
                       : "text-gray-500 hover:text-gray-900"
@@ -135,7 +127,6 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
                 </Link>
               </li>
             ))}
-            {/* Language options in mobile */}
             <li className="pt-3 border-t border-gray-100 mt-2">
               <div className="flex gap-2 py-1">
                 {locales.map((loc) => (
@@ -144,7 +135,7 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
                     href={`/${loc}${pathname.substring(currentLocale.length + 1)}`}
                     onClick={() => setMenuOpen(false)}
                     className={cn(
-                      "flex-1 text-center py-1.5 rounded-lg text-xs font-semibold border transition-colors focus-ring",
+                      "flex-1 text-center py-2 rounded-lg text-sm font-semibold border transition-colors focus-ring",
                       loc === currentLocale
                         ? "bg-accent text-white border-accent"
                         : "text-gray-500 border-gray-200 hover:text-gray-900"
@@ -155,11 +146,11 @@ export function Navbar({ isProduction = false }: { isProduction?: boolean }) {
                 ))}
               </div>
             </li>
-            <li className="pt-2 pb-1">
+            <li className="pt-3 pb-1">
               <Link
                 href={localePath("/our-projects")}
                 onClick={() => setMenuOpen(false)}
-                className="block text-center px-4 py-2.5 rounded-full bg-accent text-white text-sm font-semibold hover:bg-[var(--accent-dark)] transition-colors focus-ring"
+                className="block text-center px-4 py-3 rounded-full bg-accent text-white text-base font-semibold hover:bg-[var(--accent-dark)] transition-colors focus-ring"
               >
                 {t("applyNow")}
               </Link>

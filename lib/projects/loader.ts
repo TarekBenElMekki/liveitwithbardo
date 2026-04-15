@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Project data loader - AIESEC GIS GraphQL API.
  * Fetches open opportunities for AIESEC in Bardo (committee 1270),
  * programmes GV/GT/GE (7, 8, 9).
@@ -28,7 +28,7 @@ const OPPORTUNITIES_QUERY = `
       data {
         id title description status openings available_openings
         earliest_start_date latest_end_date experience_type
-        programme { id short_name }
+        programme { id short_name_display }
         host_lc { id name full_name }
         sdg_info { sdg_target { goal_index } }
         logistics_info { accommodation_covered food_covered transportation_covered }
@@ -133,3 +133,4 @@ export async function loadRawOpportunities(): Promise<GisOpportunity[]> {
     return [];
   }
 }
+

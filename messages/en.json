@@ -1,4 +1,4 @@
-﻿{
+{
   "nav": {
     "home": "Home",
     "discover": "Discover",
@@ -69,11 +69,11 @@
   },
   "projects": {
     "metaTitle": "Our Projects",
-    "metaDesc": "Browse volunteer, internship, and cultural exchange opportunities across Tunisia. Filter by SDG, city, and dates to find your match.",
+    "metaDesc": "Browse volunteer, talent, and teaching opportunities across Tunisia. Filter by SDG, city, and dates to find your match.",
     "badge": "AIESEC in Bardo",
     "heroHeading": "Our",
     "heroAccent": "Projects",
-    "heroSubtitle": "Browse volunteer, internship, and cultural exchange opportunities across Tunisia. Filter by SDG, city, and dates to find your match.",
+    "heroSubtitle": "Browse volunteer, talent, and teaching opportunities across Tunisia. Filter by SDG, city, and dates to find your match.",
     "filterType": "Type",
     "filterCity": "City",
     "filterStatus": "Status",
@@ -85,8 +85,8 @@
     "open": "Open",
     "closed": "Closed",
     "volunteer": "Volunteer",
-    "internship": "Internship",
-    "cultural": "Cultural",
+    "talent": "Talent",
+    "teaching": "Teaching",
     "clearAll": "Clear all",
     "removeFilter": "Remove filter: {label}",
     "projectsFound": "{count} project found",

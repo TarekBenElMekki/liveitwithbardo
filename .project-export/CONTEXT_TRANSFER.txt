@@ -1,0 +1,89 @@
+=========================================
+CONTEXT TRANSFER
+=========================================
+Generated: 2026-04-15 22:32:15
+Project root: C:\dev\Searchtool
+
+Use this bundle to continue work in another conversation or environment.
+
+SUMMARY
+- Total directories exported: 64
+- Total files exported: 158
+- Hidden export folder: .project-export
+
+TOP-LEVEL DIRECTORIES
+- .kiro
+- .project-export
+- app
+- components
+- data
+- i18n
+- lib
+- messages
+- playwright-report
+- public
+- scripts
+- test-results
+- tests
+
+TOP-LEVEL FILES
+- .env.local
+- .env.local.backup
+- .env.production
+- .env.production.example
+- .env.staging
+- .env.staging.example
+- .gitignore
+- Align-Projects-Categories-And-Transformers.ps1
+- Apply-Navbar-And-Program-Cards.ps1
+- Apply-Program-Logo-Cards-Refined.ps1
+- Apply-Selector-Projects-Changes.ps1
+- Create-Admin-Projects-Debug-And-CSV.ps1
+- Fix-Admin-Projects-Programme-Column.ps1
+- Fix-Grouped-Transformer-Exports-And-Categories.ps1
+- Fix-NextStart.ps1
+- Fix-Programme-Display-And-Encoding.ps1
+- Fix-Programme-Display-And-Encoding-v2.ps1
+- Fix-Project-Category-Mapping.ps1
+- Fix-ProjectCategory-Type-And-Labels.ps1
+- Fix-ProjectCategory-Type-And-Labels-ASCII.ps1
+- Fix-Typed-Programme-Mapping.ps1
+- Full_Project_Bundle_Generator.ps1
+- Improve-Admin-Projects-UI.ps1
+- Improve-Program-Card-Readability.ps1
+- middleware.ts
+- next.config.mjs
+- next-env.d.ts
+- package.json
+- package-lock.json
+- Patch-Program-Card-Hovers.ps1
+- playwright.config.ts
+- postcss.config.js
+- README.md
+- Rebuild-Admin-Projects-Data-And-CSV.ps1
+- Rebuild-Admin-Projects-Data-And-CSV-v2.ps1
+- Refine-Projects-Title-And-Hero.ps1
+- tailwind.config.ts
+- tsconfig.json
+- tsconfig.tsbuildinfo
+- Update-GraphQL-ShortName.ps1
+- vercel.json
+- vitest.config.ts
+- vitest.setup.ts
+
+BUNDLE CONTENTS
+- PROJECT_STRUCTURE.txt -> directory and file map
+- FULL_CODEBASE_EXPORT.txt -> full readable export of included files
+- CONTEXT_TRANSFER.txt -> this summary and handoff note
+
+SUGGESTED HANDOFF PROMPT
+I am continuing work on this project. Please use the exported bundle in .project-export. Start by reading CONTEXT_TRANSFER.txt, then PROJECT_STRUCTURE.txt, then inspect FULL_CODEBASE_EXPORT.txt for implementation details. Help me continue from the current codebase without re-architecting unless needed.
+
+EXCLUSIONS
+- Common generated/build folders were excluded
+- Binary/media/document/font/archive files were excluded
+- The export folder itself was excluded from re-export
+
+NOTES
+- This export is intended for code review, migration, and context transfer.
+- If you need binary assets too, use a separate archive/export flow.

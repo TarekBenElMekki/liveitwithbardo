@@ -12,14 +12,10 @@
   --border: #ebebeb;
   --muted: #6b7280;
   --section-alt: #f7f7f7;
-  /* Typography scale */
-  --text-eyebrow: 0.6875rem; /* 11px */
+  --text-eyebrow: 0.6875rem;
   --tracking-eyebrow: 0.12em;
-  /* Layout: promo bar height + navbar height = total fixed header height */
-  /* PromoBar: py-2 (8px top + 8px bottom) + ~20px text = ~36px = 2.25rem */
-  --promo-h: 2.25rem;
-  --nav-h: 3.5rem; /* h-14 */
-  --header-h: calc(var(--promo-h) + var(--nav-h));
+  --nav-h: 5rem;
+  --header-h: var(--nav-h);
 }
 
 * {
@@ -38,16 +34,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/**
- * Global background texture.
- * Source asset: /public/hero/bg.png
- * Applied via ::before pseudo-element so opacity never affects text or child elements.
- * Falls back gracefully to plain white if the file is missing.
- *
- * background-size: auto  → renders at native pixel size, no stretching, stays sharp
- * background-repeat: repeat → tiles cleanly
- * opacity: 0.06 → subtle but visible texture, premium feel
- */
 body::before {
   content: "";
   position: fixed;
@@ -60,27 +46,22 @@ body::before {
   pointer-events: none;
 }
 
-/* Focus ring utility */
 .focus-ring {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white;
 }
 
-/* Accent text */
 .text-accent {
   color: var(--accent);
 }
 
-/* Accent bg at low opacity — used for avatar/icon backgrounds */
 .bg-accent\/8 {
   background-color: rgba(255, 49, 49, 0.08);
 }
 
-/* Page top padding — compensates for fixed promo bar + navbar stack */
 .page-top {
   padding-top: var(--header-h);
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -92,7 +73,6 @@ body::before {
   }
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -104,27 +84,22 @@ body::before {
   border-radius: 3px;
 }
 
-/* Slider accent styling */
 input[type="range"] {
   accent-color: var(--accent);
 }
 
-/* RTL support — logical properties for directional layout */
 [dir="rtl"] .group-hover\:translate-x-1:hover {
   --tw-translate-x: -0.25rem;
 }
 
-/* Ensure Arabic text renders with correct font weight */
 [dir="rtl"] body {
   font-feature-settings: "kern" 1;
 }
 
-/* RTL: flip chevron rotation direction for accordions */
 [dir="rtl"] .rotate-180 {
   transform: rotate(180deg);
 }
 
-/* Floating animation for chat agent */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
