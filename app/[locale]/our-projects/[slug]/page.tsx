@@ -32,13 +32,14 @@ function fmtDate(iso: string | null): string {
 }
 
 const categoryColors: Record<string, string> = {
-  volunteer:  "bg-emerald-50 text-emerald-700 border-emerald-100",
-  internship: "bg-blue-50 text-blue-700 border-blue-100",
-  cultural:   "bg-amber-50 text-amber-700 border-amber-100",
+  volunteer: "bg-emerald-50 text-emerald-700 border-emerald-100",
+  talent: "bg-cyan-50 text-cyan-700 border-cyan-100",
+  teaching: "bg-amber-50 text-amber-700 border-amber-100",
 };
 
-function SlotRow({ slot, index }: { slot: ProjectSlot; index: number }) {
+function SlotRow({ slot }: { slot: ProjectSlot }) {
   const hasDate = slot.startDate || slot.endDate;
+
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-gray-50 border border-gray-100">
       <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -46,7 +47,7 @@ function SlotRow({ slot, index }: { slot: ProjectSlot; index: number }) {
         {hasDate ? (
           <span>
             <span className="font-medium">{fmtDate(slot.startDate)}</span>
-            <span className="text-gray-400 mx-1">—</span>
+            <span className="text-gray-400 mx-1">â€”</span>
             <span className="font-medium">{fmtDate(slot.endDate)}</span>
           </span>
         ) : (
@@ -82,14 +83,11 @@ export default async function ProjectSlugPage({
   if (project.logistics.food) logisticsTags.push("Meals");
   if (project.logistics.transport) logisticsTags.push("Transport");
 
-  const isGV = project.programme.toUpperCase() === "GV";
   const applyUrl = project.externalApplyUrl;
 
   return (
     <main id="main-content" className="page-top min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-        {/* Back link */}
         <Link
           href={`/${locale}/our-projects`}
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-700 transition-colors mb-10 focus-ring rounded-md"
@@ -98,7 +96,6 @@ export default async function ProjectSlugPage({
           {t("backToProjects")}
         </Link>
 
-        {/* Header */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <span
             className={cn(
@@ -108,11 +105,13 @@ export default async function ProjectSlugPage({
           >
             {project.category}
           </span>
+
           {project.programme && (
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 border border-gray-200">
               {project.programme}
             </span>
           )}
+
           <span
             className={cn(
               "text-xs font-semibold px-2.5 py-0.5 rounded-full",
@@ -134,10 +133,8 @@ export default async function ProjectSlugPage({
           {project.city}
         </div>
 
-        {/* Description */}
         <p className="text-gray-600 leading-relaxed mb-10">{project.description}</p>
 
-        {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
           {project.availableSlots > 0 && (
             <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
@@ -146,15 +143,17 @@ export default async function ProjectSlugPage({
               <p className="text-xs text-gray-400">slots available</p>
             </div>
           )}
+
           {project.fee.amount != null && project.fee.amount > 0 && (
             <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Project Fee</p>
               <p className="text-lg font-bold text-gray-900">
-                €{project.fee.amount}
+                â‚¬{project.fee.amount}
                 <span className="text-sm font-normal text-gray-400 ml-1">EUR</span>
               </p>
             </div>
           )}
+
           {logisticsTags.length > 0 && (
             <div className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Included</p>
@@ -169,7 +168,6 @@ export default async function ProjectSlugPage({
           )}
         </div>
 
-        {/* SDGs */}
         {project.sdgs.length > 0 && (
           <div className="mb-10">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">SDGs</p>
@@ -183,7 +181,6 @@ export default async function ProjectSlugPage({
           </div>
         )}
 
-        {/* Slots */}
         {project.slots.length > 0 && (
           <div className="mb-10">
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
@@ -191,15 +188,14 @@ export default async function ProjectSlugPage({
             </p>
             <div className="flex flex-col gap-2">
               {project.slots.map((slot, i) => (
-                <SlotRow key={i} slot={slot} index={i} />
+                <SlotRow key={i} slot={slot} />
               ))}
             </div>
           </div>
         )}
 
-        {/* Apply CTA */}
         <div className="pt-6 border-t border-gray-100">
-          {isGV && applyUrl ? (
+          {applyUrl ? (
             <a
               href={applyUrl}
               target="_blank"
@@ -221,9 +217,10 @@ export default async function ProjectSlugPage({
               <ExternalLink size={14} aria-hidden="true" />
             </button>
           )}
-          {!isGV && (
+
+          {!applyUrl && (
             <p className="text-xs text-gray-400 mt-2">
-              Online applications for {project.programme || "this programme"} are not available here yet. Contact AIESEC in Bardo directly.
+              Online applications are not available here yet. Contact AIESEC in Bardo directly.
             </p>
           )}
         </div>

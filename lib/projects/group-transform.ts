@@ -66,18 +66,6 @@ function buildDescription(opp: GisOpportunity) {
   return [base, ...extras].filter(Boolean).join(" ").trim();
 }
 
-
-
-function toProjectSlot(opp: GisOpportunity): ProjectSlot[] {
-  const nodes = opp.all_slots?.nodes ?? [];
-  return nodes.map((slot) => ({
-    startDate: slot.start_date ?? null,
-    endDate: slot.end_date ?? null,
-    openings: slot.openings ?? null,
-    available: null,
-  }));
-}
-
 function getEarliestStartSafe(opp: GisOpportunity): string {
   const nodes = opp.all_slots?.nodes ?? [];
   const starts = nodes
@@ -107,6 +95,16 @@ function getLatestEndSafe(opp: GisOpportunity): string {
 function hasSlots(opp: GisOpportunity) {
   const nodes = opp.all_slots?.nodes ?? [];
   return nodes.length > 0 || !!opp.earliest_start_date || !!opp.latest_end_date;
+}
+
+function toProjectSlot(opp: GisOpportunity): ProjectSlot[] {
+  const nodes = opp.all_slots?.nodes ?? [];
+  return nodes.map((slot) => ({
+    startDate: slot.start_date ?? null,
+    endDate: slot.end_date ?? null,
+    openings: slot.openings ?? null,
+    available: null,
+  }));
 }
 
 function getTotalAvailable(opp: GisOpportunity) {
@@ -164,9 +162,23 @@ function getLogistics(opp: GisOpportunity): GroupedProject["logistics"] {
 }
 
 function getExternalApplyUrl(opp: GisOpportunity) {
-  return opp.programme?.id === "7"
-    ? `https://aiesec.org/opportunity/global-volunteer/${opp.id}`
-    : null;
+  if (!opp?.id) return null;
+
+  const programmeId = opp.programme?.id;
+
+  if (programmeId === "7") {
+    return `https://aiesec.org/opportunity/global-volunteer/${opp.id}`;
+  }
+
+  if (programmeId === "8") {
+    return `https://aiesec.org/opportunity/global-talent/${opp.id}`;
+  }
+
+  if (programmeId === "9") {
+    return `https://aiesec.org/opportunity/global-teacher/${opp.id}`;
+  }
+
+  return `https://aiesec.org/opportunity/${opp.id}`;
 }
 
 export function transformToGroupedProject(
@@ -174,7 +186,6 @@ export function transformToGroupedProject(
   fallbackSlug?: string
 ): GroupedProject {
   const title = stripBracketSuffix(opp.title ?? "Untitled opportunity");
-  const programme = getProgrammeDisplay(opp.programme);
   const cleanSlugBase = fallbackSlug || slugify(`${opp.id}-${title || "opportunity"}`);
 
   return {
@@ -191,7 +202,7 @@ export function transformToGroupedProject(
     city: opp.host_lc?.name ?? "",
     category: mapCategory(opp),
     isOpen: opp.status === "open" && (opp.available_openings ?? 0) > 0,
-    programme,
+    programme: getProgrammeDisplay(opp.programme),
     totalOpenings: getTotalOpenings(opp),
     totalAvailable: getTotalAvailable(opp),
     availableSlots: getAvailableSlots(opp),
